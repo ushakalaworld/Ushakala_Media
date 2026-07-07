@@ -16,23 +16,88 @@
     <meta name="robots" content="index, follow">
 
     <!-- Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "name": "UshaKala Media",
-      "description": "Marketing That Moves Brands.",
-      "telephone": "+918830903621",
-      "email": "ushakala.world@gmail.com",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "Umbraj, Tal. Karad",
-        "addressLocality": "Satara",
-        "addressRegion": "Maharashtra",
-        "addressCountry": "IN"
-      }
-    }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, push, get, child } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        // Environment Variables
+        const appId = 'ushakala-local';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmGzGo0iTX1ayDyStLX-2AaqePaQzSIwk",
+            authDomain: "uahakala-media.firebaseapp.com",
+            databaseURL: "https://uahakala-media-default-rtdb.firebaseio.com",
+            projectId: "uahakala-media",
+            storageBucket: "uahakala-media.firebasestorage.app",
+            messagingSenderId: "463032568438",
+            appId: "1:463032568438:web:588f907dcca79c3b322d57",
+            measurementId: "G-GRH8GGRLKM"
+        };
+
+        // Initialize Firebase
+        let app, db, auth;
+        let currentUser = null;
+        let firebaseReady = false;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getDatabase(app);
+            auth = getAuth(app);
+            firebaseReady = true;
+        } catch(e) {
+            console.warn("Could not connect to Firebase. Using local fallback.");
+        }
+
+        // Local Fallback Mock Database
+        let localDB = {
+            services: [
+                { id: "s1", title: "AI SEO & Content", icon: "fas fa-robot", description: "Rank higher utilizing semantic AI models." },
+                { id: "s2", title: "Social Media Growth", icon: "fas fa-share-nodes", description: "End-to-end management, viral content creation." },
+                { id: "s3", title: "Performance Ads", icon: "fas fa-bullseye", description: "High-ROI campaigns across Meta and Google." }
+            ],
+            portfolio: [
+                { id: "p1", title: "Brand Scaling", category: "B2C", client: "TechStore", imageMain: "https://placehold.co/600x400/081B38/FF7A00?text=Project+1", description: "Increased conversion by 210%." }
+            ],
+            pricing: [
+                { id: "pr1", title: "Starter", price: "₹15k", isPopular: false, features: "Social Media Management\nBasic SEO", buttonText: "Get Started" },
+                { id: "pr2", title: "Growth", price: "₹35k", isPopular: true, features: "AI SEO\nMeta Ads", buttonText: "Get Started" }
+            ],
+            leads: []
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('year-tag').textContent = new Date().getFullYear();
+            setupInteractions();
+            
+            // Safety Exit: Always hide loader after 1 second regardless of Firebase state
+            setTimeout(() => { hideLoader(); }, 1000);
+
+            // Attempt Auth
+            if (firebaseReady) {
+                try {
+                    await signInAnonymously(auth);
+                    currentUser = true;
+                } catch (error) {
+                    console.warn("Auth failed, continuing to site.");
+                }
+            }
+
+            fetchPublicServices();
+            fetchPublicPortfolio();
+            fetchPublicPricing();
+        });
+
+        // ... Keep the rest of your existing functions (setupInteractions, fetchPublicServices, etc.) unchanged ...
+        function hideLoader() {
+            const loader = document.getElementById('global-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
+        }
     </script>
+
 
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
