@@ -1,111 +1,78 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO Meta Tags -->
-    <title>UshaKala Media | Marketing That Moves Brands</title>
-    
-    <!-- Favicon -->
+    <title>UshaKala Media | Admin Dashboard</title>
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
-    <link rel="apple-touch-icon" href="assets/logo.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #040816; color: #FFFFFF; }
+        .glass-card { background: rgba(8, 27, 56, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
 
-    <meta name="description" content="UshaKala Media is a premier AI Marketing Agency based in Maharashtra, India. We offer B2B, B2C, and Student Solutions with data-driven strategies.">
-    <meta name="keywords" content="AI Marketing, Digital Marketing Agency India, Student Solutions, SEO, Social Media Marketing, UshaKala Media">
-    <meta name="robots" content="index, follow">
+    <!-- Admin Login Overlay -->
+    <div id="login-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90">
+        <div class="glass-card p-8 rounded-2xl w-full max-w-sm text-center">
+            <h2 class="text-2xl font-bold mb-6 text-orange-500">Admin Login</h2>
+            <input type="password" id="admin-pass" placeholder="Enter Password" class="w-full p-3 mb-4 rounded bg-black text-white border border-gray-700">
+            <button onclick="checkPassword()" class="w-full py-3 bg-orange-600 rounded font-bold hover:bg-orange-700 transition">Unlock Dashboard</button>
+            <p id="login-error" class="mt-4 text-red-500 hidden">Incorrect Password!</p>
+        </div>
+    </div>
 
-    <!-- Structured Data -->
-       <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+    <!-- Dashboard Content (Hidden until login) -->
+    <div id="admin-content" class="hidden max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Admin <span class="text-orange-500">Dashboard</span></h1>
+            <a href="index.html" class="text-gray-400 hover:text-white">← Back to Website</a>
+        </div>
 
-        // 1. Setup Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDmGzGo0iTX1ayDyStLX-2AaqePaQzSIwk",
-            authDomain: "uahakala-media.firebaseapp.com",
-            databaseURL: "https://uahakala-media-default-rtdb.firebaseio.com",
-            projectId: "uahakala-media",
-            storageBucket: "uahakala-media.firebasestorage.app",
-            messagingSenderId: "463032568438",
-            appId: "1:463032568438:web:588f907dcca79c3b322d57",
-            measurementId: "G-GRH8GGRLKM"
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Manage Pricing Module -->
+            <div class="glass-card p-6 rounded-2xl">
+                <h3 class="text-xl font-bold mb-4">Manage Pricing</h3>
+                <form id="pricing-form" class="space-y-4">
+                    <input type="hidden" id="pr-id">
+                    <input type="text" id="pr-title" placeholder="Package Name (e.g. Starter)" class="w-full p-3 bg-black border border-gray-700 rounded">
+                    <input type="text" id="pr-price" placeholder="Price (e.g. ₹15k)" class="w-full p-3 bg-black border border-gray-700 rounded">
+                    <textarea id="pr-features" placeholder="Features (one per line)" class="w-full p-3 bg-black border border-gray-700 rounded"></textarea>
+                    <button type="submit" class="w-full py-2 bg-blue-900 hover:bg-blue-800 rounded">Save Package</button>
+                </form>
+            </div>
+            
+            <!-- Portfolio Module -->
+            <div class="glass-card p-6 rounded-2xl">
+                <h3 class="text-xl font-bold mb-4">Add Project</h3>
+                <form id="portfolio-form" class="space-y-4">
+                    <input type="text" id="p-title" placeholder="Project Name" class="w-full p-3 bg-black border border-gray-700 rounded">
+                    <input type="text" id="p-img" placeholder="Main Image URL" class="w-full p-3 bg-black border border-gray-700 rounded">
+                    <input type="text" id="p-video" placeholder="Video URL (Optional)" class="w-full p-3 bg-black border border-gray-700 rounded">
+                    <button type="submit" class="w-full py-2 bg-blue-900 hover:bg-blue-800 rounded">Save Project</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase Auth & Database logic goes here
+        window.checkPassword = () => {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === "Yashraj@234") {
+                document.getElementById('login-overlay').classList.add('hidden');
+                document.getElementById('admin-content').classList.remove('hidden');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
         };
 
-        // 2. Initialize App
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        // 3. Document Ready
-        document.addEventListener('DOMContentLoaded', () => {
-            // Immediately hide the loader, don't wait for anything
-            const loader = document.getElementById('global-loader');
-            if(loader) loader.style.display = 'none';
-
-            // Run site functions
-            setupInteractions();
-            fetchPublicServices();
-            fetchPublicPortfolio();
-            fetchPublicPricing();
-        });
-
-        // 4. Interaction Logic
-        function setupInteractions() {
-            const menuBtn = document.getElementById('mobile-menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-        }
-
-        // 5. Data Fetching (Simple version)
-        async function fetchPublicServices() {
-            const container = document.getElementById('public-services-container');
-            // Using a simple array if Firebase is slow/blocked
-            const services = [
-                { title: "AI SEO", icon: "fas fa-robot", description: "Semantic AI models." },
-                { title: "Social Media", icon: "fas fa-share-nodes", description: "Viral content." }
-            ];
-            container.innerHTML = services.map(s => `
-                <div class="glass-card p-8 rounded-2xl">
-                    <i class="${s.icon} text-3xl mb-4 text-brand-accent"></i>
-                    <h3 class="text-xl font-bold">${s.title}</h3>
-                    <p class="text-gray-400">${s.description}</p>
-                </div>
-            `).join('');
-        }
-
-        async function fetchPublicPortfolio() { /* ... similar logic ... */ }
-        async function fetchPublicPricing() { /* ... similar logic ... */ }
+        // Add event listeners for forms here...
     </script>
+</body>
+</html>
 
-
-
-    <!-- Google Fonts & FontAwesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            primary: '#081B38',
-                            accent: '#FF7A00',
-                            secondary: '#FF2E7E',
-                            bg: '#040816',
-                            text: '#FFFFFF'
-                        }
-                    },
-                    fontFamily: {
-                        heading: ['Poppins', 'sans-serif'],
-                        body: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
 
     <style>
         :root {
