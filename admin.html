@@ -727,7 +727,12 @@
                     return;
                 } catch (error) { 
                     console.error("Firebase write error:", error);
-                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules allow writes.");
+                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules 
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}.");
                     return;
                 }
             }
@@ -771,7 +776,12 @@
                     return;
                 } catch (error) { 
                     console.error("Firebase write error:", error);
-                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules allow writes.");
+                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules 
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}.");
                     return;
                 }
             }
@@ -809,7 +819,12 @@
                     return;
                 } catch (error) { 
                     console.error("Firebase write error:", error);
-                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules allow writes.");
+                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules 
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}.");
                     return;
                 }
             }
@@ -958,213 +973,4 @@
         }
     </script>
 </body>
-</html><!-- ... existing code ... -->
-        // UI Initialization
-        document.addEventListener('DOMContentLoaded', async () => {
-            setupInteractions();
-            
-            // SECURITY FAILSAFE TIME LIMIT
-            setTimeout(() => {
-                hideLoader();
-            }, 1500);
-
-            // Attempt Connection
-            try {
-                if (auth) {
-                    try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            const userCredential = await signInWithCustomToken(auth, __initial_auth_token);
-                            currentUser = userCredential.user;
-                        } else {
-                            throw new Error("No token");
-                        }
-                    } catch (tokenErr) {
-                        // Custom token fails if using own Firebase Config. Fallback to Anonymous.
-                        const userCredential = await signInAnonymously(auth);
-                        currentUser = userCredential.user;
-                    }
-                    firebaseReady = true;
-                }
-            } catch (error) {
-                console.warn("Firebase Auth bypassed. Did you enable Anonymous Sign-in?", error);
-            }
-        });
-
-        function setupInteractions() {
-<!-- ... existing code ... -->
-        async function handleServiceSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('s-id').value;
-            const data = {
-                title: document.getElementById('s-title').value,
-                icon: document.getElementById('s-icon').value,
-                description: document.getElementById('s-desc').value
-            };
-            
-            if (firebaseReady && currentUser) {
-                try {
-                    if(id) await updateDoc(doc(db, PATHS.services, id), data);
-                    else await addDoc(collection(db, PATHS.services), data);
-                    
-                    window.closeModals();
-                    window.fetchAdminServices();
-                    showModal("Success", "Service saved successfully to Firebase cloud.");
-                    return;
-                } catch (error) { 
-                    console.error("Firebase write error:", error);
-                    showModal("Database Blocked", "Your Firebase Rules are blocking saves! Go to Firebase Console > Firestore > Rules and set 'allow read, write: if true;'");
-                    return;
-                }
-            }
-
-            if (id) {
-                const idx = localDB.services.findIndex(x => x.id === id);
-                if (idx !== -1) localDB.services[idx] = { id, ...data };
-            } else {
-                localDB.services.push({ id: Math.random().toString(), ...data });
-            }
-            window.closeModals();
-            window.fetchAdminServices();
-            showModal("Temporary Save", "Saved to session memory. To save permanently, enable 'Anonymous Sign-in' in your Firebase Console Auth settings.");
-        }
-
-        async function handlePortfolioSubmit(e) {
-<!-- ... existing code ... -->
-        async function handlePortfolioSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('p-id').value;
-            const data = {
-                title: document.getElementById('p-title').value,
-                category: document.getElementById('p-category').value,
-                client: document.getElementById('p-client').value,
-                imageMain: document.getElementById('p-image-main').value,
-                video: document.getElementById('p-video').value,
-                img1: document.getElementById('p-img1').value,
-                img2: document.getElementById('p-img2').value,
-                img3: document.getElementById('p-img3').value,
-                img4: document.getElementById('p-img4').value,
-                img5: document.getElementById('p-img5').value,
-                description: document.getElementById('p-desc').value
-            };
-            
-            if (firebaseReady && currentUser) {
-                try {
-                    if(id) await updateDoc(doc(db, PATHS.portfolio, id), data);
-                    else await addDoc(collection(db, PATHS.portfolio), data);
-                    
-                    window.closeModals();
-                    window.fetchAdminPortfolio();
-                    showModal("Success", "Project saved successfully to Firebase cloud.");
-                    return;
-                } catch (error) { 
-                    console.error("Firebase write error:", error);
-                    showModal("Database Blocked", "Your Firebase Rules are blocking saves! Go to Firebase Console > Firestore > Rules and set 'allow read, write: if true;'");
-                    return;
-                }
-            }
-
-            if (id) {
-                const idx = localDB.portfolio.findIndex(x => x.id === id);
-                if (idx !== -1) localDB.portfolio[idx] = { id, ...data };
-            } else {
-                localDB.portfolio.push({ id: Math.random().toString(), ...data });
-            }
-            window.closeModals();
-            window.fetchAdminPortfolio();
-            showModal("Temporary Save", "Saved to session memory. To save permanently, enable 'Anonymous Sign-in' in your Firebase Console Auth settings.");
-        }
-
-        async function handlePricingSubmit(e) {
-<!-- ... existing code ... -->
-        async function handlePricingSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('pr-id').value;
-            const data = {
-                title: document.getElementById('pr-title').value,
-                price: document.getElementById('pr-price').value,
-                features: document.getElementById('pr-features').value,
-                buttonText: document.getElementById('pr-btn').value,
-                isPopular: document.getElementById('pr-popular').checked
-            };
-            
-            if (firebaseReady && currentUser) {
-                try {
-                    if(id) await updateDoc(doc(db, PATHS.pricing, id), data);
-                    else await addDoc(collection(db, PATHS.pricing), data);
-                    
-                    window.closeModals();
-                    window.fetchAdminPricing();
-                    showModal("Success", "Package saved successfully to Firebase cloud!");
-                    return;
-                } catch (error) { 
-                    console.error("Firebase write error:", error);
-                    showModal("Database Blocked", "Your Firebase Rules are blocking saves! Go to Firebase Console > Firestore > Rules and set 'allow read, write: if true;'");
-                    return;
-                }
-            }
-
-            if (id) {
-                const idx = localDB.pricing.findIndex(x => x.id === id);
-                if (idx !== -1) localDB.pricing[idx] = { id, ...data };
-            } else {
-                localDB.pricing.push({ id: Math.random().toString(), ...data });
-            }
-            window.closeModals();
-            window.fetchAdminPricing();
-            showModal("Temporary Save", "Saved to session memory. To save permanently, enable 'Anonymous Sign-in' in your Firebase Console Auth settings.");
-        }
-
-        window.deleteDocHandler = function(path, id, itemName) {
-<!-- ... existing code ... -->
-```
-
-### 2. Fix the `index.html` logic (Apply these changes)
-
-```html:UshaKala Media - Public Site:index.html
-<!-- ... existing code ... -->
-        // UI Initialization
-        document.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('year-tag').textContent = new Date().getFullYear();
-            setupInteractions();
-            
-            // SECURITY FAILSAFE TIME LIMIT: Automatically hide loader in 1.5 seconds if DB initialization takes too long
-            setTimeout(() => {
-                hideLoader();
-            }, 1500);
-
-            // Attempt Connection
-            try {
-                if (auth) {
-                    try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            const userCredential = await signInWithCustomToken(auth, __initial_auth_token);
-                            currentUser = userCredential.user;
-                        } else {
-                            throw new Error("No token");
-                        }
-                    } catch (tokenErr) {
-                        // Custom token fails if using own Firebase Config. Fallback to Anonymous.
-                        const userCredential = await signInAnonymously(auth);
-                        currentUser = userCredential.user;
-                    }
-                    firebaseReady = true;
-                }
-            } catch (error) {
-                console.warn("Firebase Auth bypassed. Did you enable Anonymous Sign-in?", error);
-            }
-
-            // Load public data immediately since we are only on the index page
-            fetchPublicServices();
-            fetchPublicPortfolio();
-            fetchPublicPricing();
-        });
-
-        function setupInteractions() {
-<!-- ... existing code ... -->
-```
-
-### How to use these new diagnostics:
-Test saving a Pricing Package inside `admin.html`. 
-
-1. **If it says "Temporary Save":** This means you have not enabled "Anonymous Authentication" inside your Firebase console. You need to log into Firebase -> Go to **Authentication** -> **Sign-in method** -> Enable **Anonymous**.
-2. **If it says "Database Blocked":** This means your Firestore rules are locked down. You need to log into Firebase -> Go to **Firestore Database** -> **Rules** -> Change it to `allow read, write: if true;` and click Publish.
+</html>
