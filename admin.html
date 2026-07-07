@@ -4,13 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>UshaKala Media | Admin Dashboard</title>
+    <!-- SEO Meta Tags -->
+    <title>UshaKala Media | Marketing That Moves Brands</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
     <link rel="apple-touch-icon" href="assets/logo.jpg">
 
-    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="UshaKala Media is a premier AI Marketing Agency based in Maharashtra, India. We offer B2B, B2C, and Student Solutions with data-driven strategies.">
+    <meta name="keywords" content="AI Marketing, Digital Marketing Agency India, Student Solutions, SEO, Social Media Marketing, UshaKala Media">
+    <meta name="robots" content="index, follow">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "UshaKala Media",
+      "description": "Marketing That Moves Brands.",
+      "telephone": "+918830903621",
+      "email": "ushakala.world@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Umbraj, Tal. Karad",
+        "addressLocality": "Satara",
+        "addressRegion": "Maharashtra",
+        "addressCountry": "IN"
+      }
+    }
+    </script>
 
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
@@ -74,6 +96,12 @@
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
         }
 
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: #FF7A00;
+        }
+
+        /* Typography */
         .gradient-text {
             background: linear-gradient(90deg, #FF7A00, #FF2E7E);
             -webkit-background-clip: text;
@@ -86,10 +114,45 @@
         ::-webkit-scrollbar-thumb { background: #081B38; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #FF7A00; }
 
-        /* Admin Layout */
-        #admin-view { min-height: 100vh; }
-        .admin-sidebar { background: #081B38; border-right: 1px solid var(--glass-border); }
-        .admin-nav-link.active { background: rgba(255,122,0, 0.2); border-left: 4px solid #FF7A00; }
+        /* Animations */
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -50px) scale(1.1); }
+        }
+        
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.4;
+            animation: float 8s infinite alternate ease-in-out;
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Marquee */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+        }
+        .marquee-track {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
 
         /* Custom Modal Loader */
         .spinner {
@@ -105,6 +168,7 @@
 </head>
 <body class="relative antialiased">
 
+    <!-- Custom Modal -->
     <div id="custom-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm">
         <div class="glass-card w-full max-w-md p-8 rounded-2xl text-center relative mx-4">
             <h3 id="modal-title" class="text-2xl font-heading font-bold mb-4 gradient-text">Notice</h3>
@@ -119,309 +183,248 @@
     <div id="global-loader" class="fixed inset-0 z-[9998] flex items-center justify-center bg-brand-bg bg-opacity-90 backdrop-blur-md">
         <div class="flex flex-col items-center">
             <div class="spinner mb-4"></div>
-            <p class="text-brand-accent font-heading animate-pulse">Initializing UshaKala Admin...</p>
+            <p class="text-brand-accent font-heading animate-pulse">Initializing UshaKala AI...</p>
         </div>
     </div>
 
     <!-- ==========================================
-         VIEW: SECURE ADMIN DASHBOARD
+         VIEW: PUBLIC MARKETING AGENCY SITE
          ========================================== -->
-    <div id="admin-view" class="w-full bg-brand-bg flex h-screen overflow-hidden relative">
-        
-        <!-- Admin Password Check Overlay -->
-        <div id="admin-login-overlay" class="absolute inset-0 z-50 flex items-center justify-center bg-brand-bg bg-opacity-95 backdrop-blur-md p-4">
-            <div class="glass-card w-full max-w-md p-8 rounded-2xl text-center">
-                <i class="fas fa-lock text-5xl text-brand-accent mb-4"></i>
-                <h2 class="text-2xl font-heading font-bold mb-2">Admin Workspace</h2>
-                <p class="text-gray-400 text-sm mb-6">Enter credentials to unlock management portal.</p>
-                <div class="mb-6">
-                    <input type="password" id="admin-password-input" placeholder="Enter Secure Password" class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent text-center tracking-widest text-lg transition">
-                </div>
-                <button id="admin-login-submit" class="w-full py-3 bg-gradient-to-r from-brand-accent to-[#FF5500] rounded-lg font-bold shadow-[0_4px_15px_rgba(255,122,0,0.4)] hover:scale-105 transition mb-4">Login</button>
-                <a href="index.html" class="text-gray-400 text-sm hover:text-white transition block mt-4">Return to Landing Page</a>
-            </div>
-        </div>
-
-        <!-- Admin Sidebar -->
-        <aside class="w-64 admin-sidebar flex flex-col hidden md:flex h-full relative z-20 shadow-2xl">
-            <div class="p-6 border-b border-[rgba(255,255,255,0.1)] flex flex-col gap-3">
-                <div class="flex items-center gap-3">
-                    <img src="assets/logo.jpg" alt="UshaKala Media Logo" class="h-10 w-auto rounded-lg bg-white p-1 shadow-md">
-                    <span class="text-lg font-heading font-bold">UshaKala <span class="text-brand-accent">Media</span></span>
-                </div>
-                <h2 class="text-xs font-heading font-bold text-gray-400 tracking-widest uppercase">Admin Portal</h2>
-            </div>
-            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-                <button onclick="adminRouter('leads')" class="admin-nav-link w-full text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-[rgba(255,255,255,0.05)] transition active">
-                    <i class="fas fa-inbox w-6"></i> Inquiries
-                </button>
-                <button onclick="adminRouter('services')" class="admin-nav-link w-full text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-[rgba(255,255,255,0.05)] transition">
-                    <i class="fas fa-concierge-bell w-6"></i> Services
-                </button>
-                <button onclick="adminRouter('portfolio')" class="admin-nav-link w-full text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-[rgba(255,255,255,0.05)] transition">
-                    <i class="fas fa-briefcase w-6"></i> Portfolio
-                </button>
-                <button onclick="adminRouter('pricing')" class="admin-nav-link w-full text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-[rgba(255,255,255,0.05)] transition">
-                    <i class="fas fa-tags w-6"></i> Pricing
-                </button>
-                <button onclick="adminRouter('analytics')" class="admin-nav-link w-full text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-[rgba(255,255,255,0.05)] transition">
-                    <i class="fas fa-chart-line w-6"></i> Analytics
-                </button>
-                <button onclick="adminRouter('settings')" class="admin-nav-link w-full text-left px-4 py-3 rounded-lg text-gray-300 hover:bg-[rgba(255,255,255,0.05)] transition">
-                    <i class="fas fa-cog w-6"></i> Settings
-                </button>
-            </nav>
-            <div class="p-4 border-t border-[rgba(255,255,255,0.1)]">
-                <a href="index.html" id="admin-logout-btn" class="block text-center w-full py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Log Out / Exit
+    <div id="public-view" class="w-full">
+        <!-- Navigation -->
+        <nav class="fixed top-0 w-full z-50 glass-panel border-b-0 py-4 transition-all duration-300" id="navbar">
+            <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+                <a href="#home" class="flex items-center gap-3 z-50">
+                    <img src="assets/logo.jpg" alt="UshaKala Media Logo" class="h-10 md:h-12 w-auto rounded-lg bg-white p-1 shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:scale-105 transition-transform duration-300">
+                    <span class="text-xl md:text-2xl font-heading font-bold tracking-wide">UshaKala <span class="text-brand-accent">Media</span></span>
                 </a>
-            </div>
-        </aside>
+                
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex space-x-8 items-center font-medium">
+                    <a href="#about" class="hover:text-brand-accent transition">About</a>
+                    <a href="#services" class="hover:text-brand-accent transition">Services</a>
+                    <a href="#portfolio" class="hover:text-brand-accent transition">Work</a>
+                    <a href="#pricing" class="hover:text-brand-accent transition">Pricing</a>
+                    <a href="#contact" class="px-5 py-2 bg-gradient-to-r from-brand-accent to-[#FF5500] rounded-lg shadow-[0_4px_15px_rgba(255,122,0,0.4)] hover:scale-105 transition transform">Consultation</a>
+                </div>
 
-        <!-- Admin Main Content -->
-        <main class="flex-1 h-full overflow-y-auto p-8 relative z-10">
-            <!-- Mobile Header for Admin -->
-            <div class="md:hidden flex justify-between items-center mb-8 pb-4 border-b border-[rgba(255,255,255,0.1)]">
-                <div class="flex items-center gap-3">
-                    <img src="assets/logo.jpg" alt="Logo" class="h-8 w-auto rounded bg-white p-1">
-                    <span class="text-lg font-heading font-bold">UshaKala</span>
-                </div>
-                <a href="index.html" id="admin-mobile-exit" class="text-red-500"><i class="fas fa-times text-2xl"></i></a>
-            </div>
-
-            <!-- Leads Module (Default) -->
-            <div id="admin-module-leads" class="admin-module block">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-heading font-bold">Recent Inquiries</h1>
-                    <button onclick="fetchAdminLeads()" class="px-4 py-2 bg-[rgba(255,255,255,0.1)] rounded-lg hover:bg-brand-accent transition"><i class="fas fa-sync-alt"></i> Refresh</button>
-                </div>
-                <div class="glass-card rounded-2xl overflow-hidden overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[600px]">
-                        <thead>
-                            <tr class="bg-black bg-opacity-40">
-                                <th class="p-4 border-b border-[rgba(255,255,255,0.1)]">Name</th>
-                                <th class="p-4 border-b border-[rgba(255,255,255,0.1)]">Interest</th>
-                                <th class="p-4 border-b border-[rgba(255,255,255,0.1)]">Email</th>
-                                <th class="p-4 border-b border-[rgba(255,255,255,0.1)]">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-leads-tbody">
-                            <tr><td colspan="4" class="p-8 text-center text-gray-500">Loading leads...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-2xl z-50 focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
 
-            <!-- Services Module -->
-            <div id="admin-module-services" class="admin-module hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-heading font-bold">Manage Services</h1>
-                    <button onclick="openServiceForm()" class="px-4 py-2 bg-brand-accent text-white rounded-lg hover:bg-[#FF5500] transition shadow-lg"><i class="fas fa-plus"></i> Add Service</button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="admin-services-grid">
-                    <!-- Loaded dynamically via JS -->
-                </div>
+            <!-- Mobile Nav (Hidden by default) -->
+            <div id="mobile-menu" class="fixed inset-0 bg-brand-bg bg-opacity-95 backdrop-blur-lg flex-col items-center justify-center space-y-8 text-xl hidden z-40">
+                <a href="#home" class="mobile-link hover:text-brand-accent">Home</a>
+                <a href="#about" class="mobile-link hover:text-brand-accent">About</a>
+                <a href="#services" class="mobile-link hover:text-brand-accent">Services</a>
+                <a href="#portfolio" class="mobile-link hover:text-brand-accent">Work</a>
+                <a href="#contact" class="mobile-link text-brand-accent">Contact</a>
             </div>
+        </nav>
 
-            <!-- Portfolio Module -->
-            <div id="admin-module-portfolio" class="admin-module hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-heading font-bold">Manage Portfolio</h1>
-                    <button onclick="openPortfolioForm()" class="px-4 py-2 bg-brand-accent text-white rounded-lg hover:bg-[#FF5500] transition shadow-lg"><i class="fas fa-plus"></i> Add Project</button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="admin-portfolio-grid">
-                    <!-- Loaded dynamically via JS -->
-                </div>
-            </div>
-
-            <!-- Pricing Module -->
-            <div id="admin-module-pricing" class="admin-module hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-heading font-bold">Manage Pricing</h1>
-                    <button onclick="openPricingForm()" class="px-4 py-2 bg-brand-secondary text-white rounded-lg hover:bg-[#FF1A6A] transition shadow-lg"><i class="fas fa-plus"></i> Add Package</button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="admin-pricing-grid">
-                    <!-- Loaded dynamically via JS -->
-                </div>
-            </div>
-
-            <!-- Analytics Module -->
-            <div id="admin-module-analytics" class="admin-module hidden">
-                <h1 class="text-3xl font-heading font-bold mb-6">Overview & Analytics</h1>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-brand-accent">
-                        <p class="text-gray-400 text-sm mb-1">Total Page Views</p>
-                        <h3 class="text-3xl font-bold">12,450</h3>
-                        <p class="text-green-500 text-xs mt-2"><i class="fas fa-arrow-up"></i> 14% this week</p>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-brand-secondary">
-                        <p class="text-gray-400 text-sm mb-1">Total Leads Generated</p>
-                        <h3 class="text-3xl font-bold">342</h3>
-                        <p class="text-green-500 text-xs mt-2"><i class="fas fa-arrow-up"></i> 5% this week</p>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl border-l-4 border-blue-500">
-                        <p class="text-gray-400 text-sm mb-1">Active Client Projects</p>
-                        <h3 class="text-3xl font-bold">18</h3>
-                        <p class="text-gray-500 text-xs mt-2">Steady</p>
-                    </div>
-                </div>
-                <div class="glass-card p-8 rounded-2xl flex items-center justify-center h-64 border border-dashed border-gray-600">
-                    <p class="text-gray-500"><i class="fas fa-chart-bar text-4xl mb-4 block text-center opacity-50"></i> Advanced chart integration standing by (Requires external charting library like Chart.js)</p>
-                </div>
-            </div>
-
-            <!-- Settings / Hero Manager Module -->
-            <div id="admin-module-settings" class="admin-module hidden">
-                <h1 class="text-3xl font-heading font-bold mb-6">Site Settings & SEO</h1>
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="glass-card p-6 rounded-2xl">
-                        <h3 class="text-xl font-bold mb-4 border-b border-[rgba(255,255,255,0.1)] pb-2"><i class="fas fa-home text-brand-accent mr-2"></i> Hero Section Manager</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-1">Headline Text</label>
-                                <input type="text" value="Marketing That Moves Brands" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
-                            </div>
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-1">Subheadline</label>
-                                <textarea rows="3" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">We combine AI-driven insights with human creativity to scale B2B/B2C businesses and empower students for the digital future.</textarea>
-                            </div>
-                            <button onclick="showModal('Settings Saved', 'Hero section updated successfully.')" class="px-4 py-2 bg-brand-accent text-white rounded-lg hover:bg-[#FF5500] transition">Update Hero</button>
-                        </div>
-                    </div>
-
-                    <div class="glass-card p-6 rounded-2xl">
-                        <h3 class="text-xl font-bold mb-4 border-b border-[rgba(255,255,255,0.1)] pb-2"><i class="fas fa-search text-brand-secondary mr-2"></i> SEO Metadata</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-1">Site Meta Description</label>
-                                <textarea rows="3" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">UshaKala Media is a premier AI Marketing Agency based in Maharashtra, India. We offer B2B, B2C, and Student Solutions with data-driven strategies.</textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-1">Target Keywords (Comma Separated)</label>
-                                <input type="text" value="AI Marketing, Digital Marketing Agency India, Student Solutions" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
-                            </div>
-                            <button onclick="showModal('SEO Updated', 'Meta tags and structured data updated.')" class="px-4 py-2 border border-brand-secondary text-brand-secondary rounded-lg hover:bg-brand-secondary hover:text-white transition">Save SEO</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Hero Section -->
+        <section id="home" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+            <!-- Background Elements -->
+            <div class="blob bg-brand-primary w-[500px] h-[500px] top-[-100px] left-[-100px]"></div>
+            <div class="blob bg-brand-secondary w-[400px] h-[400px] bottom-[-50px] right-[-50px]" style="animation-delay: -4s;"></div>
             
-        </main>
-    </div>
+            <div class="relative z-10 max-w-4xl mx-auto px-6 text-center fade-in-up">
+                <div class="inline-block px-4 py-1.5 rounded-full border border-brand-accent bg-brand-accent bg-opacity-10 text-brand-accent text-sm font-semibold mb-6">
+                    Next-Gen AI Marketing Agency
+                </div>
+                <h1 class="text-5xl md:text-7xl font-heading font-extrabold mb-6 leading-tight">
+                    Marketing That <br/> <span class="gradient-text">Moves Brands</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+                    We combine AI-driven insights with human creativity to scale B2B/B2C businesses and empower students for the digital future.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#services" class="px-8 py-3 bg-gradient-to-r from-brand-accent to-[#FF5500] rounded-lg font-bold shadow-[0_4px_15px_rgba(255,122,0,0.4)] hover:scale-105 transition">Explore Services</a>
+                    <a href="#contact" class="px-8 py-3 border-2 border-brand-secondary text-white rounded-lg font-bold hover:bg-brand-secondary shadow-[0_4px_15px_rgba(255,46,126,0.2)] transition">Book a Call</a>
+                </div>
+            </div>
+        </section>
 
-    <!-- Service Form Modal -->
-    <div id="modal-service-form" class="fixed inset-0 z-[9995] hidden flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm p-4">
-        <div class="glass-card w-full max-w-lg p-8 rounded-2xl relative">
-            <button onclick="closeModals()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
-            <h3 id="form-service-title" class="text-2xl font-bold mb-6">Add/Edit Service</h3>
-            <form id="service-form" class="space-y-4">
-                <input type="hidden" id="s-id">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Service Title</label>
-                    <input type="text" id="s-title" required class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
+        <!-- About Section -->
+        <section id="about" class="py-24 glass-panel relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <div class="fade-in-up">
+                        <h2 class="text-4xl font-heading font-bold mb-6">Redefining Growth <br><span class="gradient-text">Through AI</span></h2>
+                        <p class="text-gray-300 mb-6 text-lg leading-relaxed">
+                            Based in Maharashtra, UshaKala Media is not just an agency; we are your growth ecosystem. We build scalable strategies utilizing semantic AI, predictive analytics, and viral content frameworks to dominate modern digital landscapes.
+                        </p>
+                        <div class="grid grid-cols-2 gap-8 mt-8">
+                            <div>
+                                <h3 class="text-4xl font-bold text-brand-accent mb-2"><span class="counter" data-target="150">0</span>+</h3>
+                                <p class="text-sm text-gray-400 uppercase tracking-wider">Brands Scaled</p>
+                            </div>
+                            <div>
+                                <h3 class="text-4xl font-bold text-brand-secondary mb-2"><span class="counter" data-target="500">0</span>+</h3>
+                                <p class="text-sm text-gray-400 uppercase tracking-wider">Students Empowered</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fade-in-up delay-100 relative">
+                        <div class="glass-card aspect-square rounded-3xl flex items-center justify-center p-8 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-brand-primary to-transparent opacity-50"></div>
+                            <i class="fas fa-rocket text-9xl text-brand-accent relative z-10 animate-bounce" style="animation-duration: 3s;"></i>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">FontAwesome Icon Class (e.g. fas fa-robot)</label>
-                    <input type="text" id="s-icon" required class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Short Description</label>
-                    <textarea id="s-desc" required rows="3" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent"></textarea>
-                </div>
-                <button type="submit" class="w-full py-3 bg-brand-accent text-white rounded-lg hover:bg-[#FF5500] font-bold transition">Save Service</button>
-            </form>
-        </div>
-    </div>
+            </div>
+        </section>
 
-    <!-- Portfolio Form Modal -->
-    <div id="modal-portfolio-form" class="fixed inset-0 z-[9995] hidden flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm p-4 overflow-y-auto">
-        <div class="glass-card w-full max-w-lg p-8 rounded-2xl relative my-8">
-            <button onclick="closeModals()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
-            <h3 id="form-portfolio-title" class="text-2xl font-bold mb-6">Add/Edit Project</h3>
-            <form id="portfolio-form" class="space-y-4">
-                <input type="hidden" id="p-id">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Project Title</label>
-                    <input type="text" id="p-title" required class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
+        <!-- Services Section -->
+        <section id="services" class="py-24 relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16 fade-in-up">
+                    <h2 class="text-4xl font-heading font-bold mb-4">Our <span class="gradient-text">Capabilities</span></h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">Omnichannel solutions tailored for businesses and ambitious students.</p>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">Category</label>
-                        <input type="text" id="p-category" required placeholder="e.g. B2B, B2C" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">Client Name</label>
-                        <input type="text" id="p-client" placeholder="Optional" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
-                    </div>
+                
+                <!-- Dynamic Services Container -->
+                <div id="public-services-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Loaded dynamically via script -->
                 </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Main Image URL <span class="text-brand-accent">*Compulsory</span></label>
-                    <input type="text" id="p-image-main" required placeholder="https://..." class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Video URL (Optional)</label>
-                    <input type="text" id="p-video" placeholder="YouTube/Vimeo/MP4 Link" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
-                </div>
-                <div class="pt-2">
-                    <label class="block text-sm text-gray-400 mb-2">Additional Images (Optional, up to 5)</label>
-                    <div class="grid grid-cols-1 gap-2">
-                        <input type="text" id="p-img1" placeholder="Optional Image 1 URL" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-brand-accent text-sm">
-                        <input type="text" id="p-img2" placeholder="Optional Image 2 URL" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-brand-accent text-sm">
-                        <input type="text" id="p-img3" placeholder="Optional Image 3 URL" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-brand-accent text-sm">
-                        <input type="text" id="p-img4" placeholder="Optional Image 4 URL" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-brand-accent text-sm">
-                        <input type="text" id="p-img5" placeholder="Optional Image 5 URL" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-3 py-1.5 text-white focus:outline-none focus:border-brand-accent text-sm">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Results/Description</label>
-                    <textarea id="p-desc" required rows="3" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent"></textarea>
-                </div>
-                <button type="submit" class="w-full py-3 bg-brand-accent text-white rounded-lg hover:bg-[#FF5500] font-bold transition mt-2">Save Project</button>
-            </form>
-        </div>
-    </div>
+            </div>
+        </section>
 
-    <!-- Pricing Form Modal -->
-    <div id="modal-pricing-form" class="fixed inset-0 z-[9995] hidden flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm p-4 overflow-y-auto">
-        <div class="glass-card w-full max-w-lg p-8 rounded-2xl relative my-8">
-            <button onclick="closeModals()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
-            <h3 id="form-pricing-title" class="text-2xl font-bold mb-6">Add/Edit Pricing Tier</h3>
-            <form id="pricing-form" class="space-y-4">
-                <input type="hidden" id="pr-id">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">Package Name</label>
-                        <input type="text" id="pr-title" required placeholder="e.g. Starter" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
+        <!-- Portfolio Section -->
+        <section id="portfolio" class="py-24 glass-panel relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-12 fade-in-up">
+                    <h2 class="text-4xl font-heading font-bold mb-4">Featured <span class="gradient-text">Work</span></h2>
+                </div>
+
+                <!-- Client Marquee -->
+                <div class="marquee-container py-8 border-y border-[rgba(255,255,255,0.1)] bg-black bg-opacity-20 mb-16 fade-in-up">
+                    <div class="marquee-track" id="client-marquee">
+                        <span class="text-2xl font-heading text-gray-500 mx-12">TechCorp</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">EduGrowth</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">InnovateAI</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">Global Retail</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">TechCorp</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">EduGrowth</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">InnovateAI</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">Global Retail</span>
                     </div>
-                    <div>
-                        <label class="block text-sm text-gray-400 mb-1">Price</label>
-                        <input type="text" id="pr-price" required placeholder="e.g. ₹15k/mo" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
+                </div>
+
+                <!-- Dynamic Portfolio Container -->
+                <div id="public-portfolio-container" class="grid grid-cols-1 md:grid-cols-2 gap-8 fade-in-up">
+                    <!-- Loaded dynamically via script -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="py-24 relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16 fade-in-up">
+                    <h2 class="text-4xl font-heading font-bold mb-4">Transparent <span class="gradient-text">Pricing</span></h2>
+                </div>
+                
+                <div id="public-pricing-container" class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                    <!-- Pricing tiers loaded dynamically via script -->
+                    <div class="col-span-full p-8 text-center text-gray-500">
+                        <div class="spinner mx-auto inline-block mb-4"></div>
+                        <p>Loading active packages...</p>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Button Text</label>
-                    <input type="text" id="pr-btn" required value="Get Started" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent">
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-24 glass-panel relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid md:grid-cols-2 gap-16">
+                    <div class="fade-in-up">
+                        <h2 class="text-4xl font-heading font-bold mb-6">Let's Build <span class="gradient-text">Together</span></h2>
+                        <p class="text-gray-300 mb-8">Ready to scale your brand or build your student portfolio? Reach out to us today.</p>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-brand-accent bg-opacity-20 rounded-full flex items-center justify-center text-brand-accent text-xl mr-4"><i class="fas fa-map-marker-alt"></i></div>
+                                <div><p class="font-bold">Location</p><p class="text-gray-400 text-sm">Umbraj, Karad, Satara, Maharashtra</p></div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-brand-secondary bg-opacity-20 rounded-full flex items-center justify-center text-brand-secondary text-xl mr-4"><i class="fas fa-phone"></i></div>
+                                <div><p class="font-bold">Phone / WhatsApp</p><p class="text-gray-400 text-sm">+91 8830903621</p></div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center text-blue-400 text-xl mr-4"><i class="fas fa-envelope"></i></div>
+                                <div><p class="font-bold">Email</p><p class="text-gray-400 text-sm">ushakala.world@gmail.com</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fade-in-up delay-100">
+                        <form id="public-contact-form" class="glass-card p-8 rounded-2xl">
+                            <div class="mb-4">
+                                <input type="text" id="c-name" required placeholder="Your Name" class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent transition">
+                            </div>
+                            <div class="mb-4">
+                                <input type="email" id="c-email" required placeholder="Your Email" class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent transition">
+                            </div>
+                            <div class="mb-4">
+                                <select id="c-interest" required class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent transition appearance-none">
+                                    <option value="" disabled selected>I'm interested in...</option>
+                                    <option value="B2B">Business Services (B2B)</option>
+                                    <option value="B2C">Brand Scaling (B2C)</option>
+                                    <option value="Student">Student Portfolio Development</option>
+                                </select>
+                            </div>
+                            <div class="mb-6">
+                                <textarea id="c-message" required rows="4" placeholder="Tell us about your project" class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent transition"></textarea>
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-accent to-[#FF5500] rounded-lg font-bold shadow-[0_4px_15px_rgba(255,122,0,0.4)] hover:scale-105 transition">Send Message</button>
+                        </form>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Features (One per line)</label>
-                    <textarea id="pr-features" required rows="4" placeholder="Social Media Management&#10;Basic SEO setup" class="w-full bg-black bg-opacity-50 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-brand-accent"></textarea>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="pt-16 pb-8 bg-[#02040a] border-t border-[rgba(255,255,255,0.05)] text-center relative z-10">
+            <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center mb-8">
+                <div class="mb-6 md:mb-0 text-left">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="assets/logo.jpg" alt="UshaKala Media Logo" class="h-10 w-auto rounded-lg bg-white p-1">
+                        <span class="text-xl font-heading font-bold">UshaKala <span class="text-brand-accent">Media</span></span>
+                    </div>
+                    <p class="text-gray-500 text-sm">Marketing That Moves Brands.</p>
                 </div>
-                <div class="flex items-center mt-2">
-                    <input type="checkbox" id="pr-popular" class="w-5 h-5 mr-3 accent-brand-accent">
-                    <label for="pr-popular" class="text-white">Mark as "Most Popular"</label>
+                <div class="flex space-x-6 text-xl">
+                    <a href="https://instagram.com/ushakala.world" target="_blank" class="text-gray-400 hover:text-brand-secondary transition"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/918830903621" target="_blank" class="text-gray-400 hover:text-green-500 transition"><i class="fab fa-whatsapp"></i></a>
+                    <a href="mailto:ushakala.world@gmail.com" class="text-gray-400 hover:text-brand-accent transition"><i class="fas fa-envelope"></i></a>
                 </div>
-                <button type="submit" class="w-full py-3 bg-brand-secondary text-white rounded-lg hover:bg-[#FF1A6A] font-bold transition mt-4">Save Package</button>
-            </form>
-        </div>
+            </div>
+            <p class="text-gray-600 text-sm">
+                &copy; <span id="year-tag"></span> UshaKala Media. All Rights Reserved. 
+                <span class="mx-2">|</span> 
+                <!-- Link to separate Admin Page -->
+                <a href="admin.html" class="hover:text-brand-accent transition font-bold">Admin Panel</a>
+            </p>
+        </footer>
     </div>
 
     <!-- Firebase Modules & Scripts -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import {
+    getDatabase,
+    ref,
+    push,
+    get,
+    child
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-        // Environment Variables provided by Canvas Immersive Environment
+        // Environment Variables & App ID
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ushakala-local';
         
         // YOUR REAL FIREBASE CONFIGURATION
@@ -437,14 +440,13 @@
         };
 
         // Initialize Firebase
-        let app, db, auth;
-        let currentUser = null;
-        let firebaseReady = false;
+      let app, db, auth;
+let currentUser = null;
+let firebaseReady = false;
 
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
+app = initializeApp(firebaseConfig);
+db = getDatabase(app);
+auth = getAuth(app);
         } catch(e) {
             console.warn("Could not connect to online Firebase instance. Standing by to render fallbacks.");
         }
@@ -478,9 +480,10 @@
 
         // UI Initialization
         document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('year-tag').textContent = new Date().getFullYear();
             setupInteractions();
             
-            // SECURITY FAILSAFE TIME LIMIT
+            // SECURITY FAILSAFE TIME LIMIT: Automatically hide loader in 1.5 seconds if DB initialization takes too long
             setTimeout(() => {
                 hideLoader();
             }, 1500);
@@ -500,463 +503,245 @@
             } catch (error) {
                 console.warn("Firebase Auth bypassed or offline. Utilizing local high-speed mock DB.", error);
             }
+
+            // Load public data immediately since we are only on the index page
+            fetchPublicServices();
+            fetchPublicPortfolio();
+            fetchPublicPricing();
         });
 
         function setupInteractions() {
-            // Admin Passkey Login Logic
-            const handleAdminLogin = () => {
-                const pwd = document.getElementById('admin-password-input').value;
-                if (pwd === 'Yashraj@234') {
-                    document.getElementById('admin-login-overlay').classList.add('hidden');
-                    document.getElementById('admin-password-input').value = '';
-                    adminRouter('leads'); 
-                } else {
-                    showModal("Access Denied", "Incorrect password. Please try again.");
-                }
-            };
-
-            document.getElementById('admin-login-submit').addEventListener('click', handleAdminLogin);
-            document.getElementById('admin-password-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleAdminLogin();
+            // Mobile Menu Toggle
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+            
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('flex');
+                menuBtn.innerHTML = mobileMenu.classList.contains('hidden') ? '<i class="fas fa-bars"></i>' : '<i class="fas fa-times text-brand-accent"></i>';
+            });
+            
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenu.classList.remove('flex');
+                    menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                });
             });
 
-            // Admin Submission Bindings
-            document.getElementById('service-form').addEventListener('submit', handleServiceSubmit);
-            document.getElementById('portfolio-form').addEventListener('submit', handlePortfolioSubmit);
-            document.getElementById('pricing-form').addEventListener('submit', handlePricingSubmit);
+            // Scroll Animation Observer
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        
+                        // Counter numerical scaling
+                        const counters = entry.target.querySelectorAll('.counter');
+                        counters.forEach(counter => {
+                            const target = +counter.getAttribute('data-target');
+                            const speed = 200;
+                            const updateCount = () => {
+                                const count = +counter.innerText;
+                                const inc = target / speed;
+                                if (count < target) {
+                                    counter.innerText = Math.ceil(count + inc);
+                                    setTimeout(updateCount, 15);
+                                } else {
+                                    counter.innerText = target;
+                                }
+                            };
+                            updateCount();
+                        });
+
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+
+            // Contact Form Submission Handler
+            document.getElementById('public-contact-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const btn = e.target.querySelector('button');
+                const originalText = btn.innerText;
+                btn.innerText = "Sending..."; btn.disabled = true;
+
+                const inquiryData = {
+                    name: document.getElementById('c-name').value,
+                    email: document.getElementById('c-email').value,
+                    interest: document.getElementById('c-interest').value,
+                    message: document.getElementById('c-message').value,
+                    timestamp: Date.now()
+                };
+
+                if (firebaseReady && currentUser) {
+                    try {
+                       await push(ref(db, "leads"), inquiryData);
+                        e.target.reset();
+                        showModal("Success!", "Your inquiry has been sent. We will reach out shortly.");
+                    } catch (error) {
+                        console.error(error);
+                        showModal("Local Backup Active", "Your info was saved locally inside the portal session.");
+                    } finally {
+                        btn.innerText = originalText; btn.disabled = false;
+                    }
+                } else {
+                    // Fallback storage
+                    localDB.leads.push({ id: Math.random().toString(), ...inquiryData });
+                    e.target.reset();
+                    showModal("Success!", "Inquiry registered locally inside this session context.");
+                    btn.innerText = originalText; btn.disabled = false;
+                }
+            });
         }
 
-        window.adminRouter = function(moduleName) {
-            document.querySelectorAll('.admin-nav-link').forEach(link => {
-                link.classList.remove('active', 'bg-[rgba(255,122,0,0.2)]', 'border-l-4', 'border-brand-accent');
-                if(link.innerHTML.toLowerCase().includes(moduleName.substring(0,4))) {
-                    link.classList.add('active', 'bg-[rgba(255,122,0,0.2)]', 'border-l-4', 'border-brand-accent');
-                }
-            });
-
-            document.querySelectorAll('.admin-module').forEach(mod => mod.classList.add('hidden'));
-            document.getElementById(`admin-module-${moduleName}`).classList.remove('hidden');
-
-            if(moduleName === 'leads') window.fetchAdminLeads();
-            if(moduleName === 'services') window.fetchAdminServices();
-            if(moduleName === 'portfolio') window.fetchAdminPortfolio();
-            if(moduleName === 'pricing') window.fetchAdminPricing();
-        };
-
-        window.fetchAdminLeads = async function() {
-            const tbody = document.getElementById('admin-leads-tbody');
-            tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center"><div class="spinner mx-auto inline-block"></div></td></tr>';
-            
+        async function fetchPublicServices() {
+            const container = document.getElementById('public-services-container');
             if (firebaseReady && currentUser) {
                 try {
-                    const snap = await getDocs(collection(db, PATHS.leads));
-                    tbody.innerHTML = '';
-                    if(snap.empty) {
-                        tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No leads found on cloud server.</td></tr>';
+                   const snap = await get(child(ref(db), "services"));
+                    if (!snap.empty) {
+                        container.innerHTML = '';
+                        snap.forEach(doc => {
+                            const data = doc.data();
+                            container.innerHTML += `
+                                <div class="glass-card p-8 rounded-2xl hover:-translate-y-2 transition duration-300">
+                                    <div class="w-16 h-16 bg-[rgba(255,122,0,0.1)] rounded-2xl flex items-center justify-center text-brand-accent text-3xl mb-6">
+                                        <i class="${data.icon}"></i>
+                                    </div>
+                                    <h3 class="text-2xl font-bold mb-4">${data.title}</h3>
+                                    <p class="text-gray-400">${data.description}</p>
+                                </div>
+                            `;
+                        });
                         return;
                     }
-                    
-                    let leadsList = [];
-                    snap.forEach(doc => leadsList.push({id: doc.id, ...doc.data()}));
-                    leadsList.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-                    leadsList.forEach(data => {
-                        tbody.innerHTML += `
-                            <tr class="border-b border-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.02)]">
-                                <td class="p-4 font-bold text-white">${data.name}</td>
-                                <td class="p-4"><span class="px-2 py-1 bg-brand-primary rounded text-xs text-brand-accent">${data.interest}</span></td>
-                                <td class="p-4">${data.email}</td>
-                                <td class="p-4">
-                                    <button onclick="deleteDocHandler('${PATHS.leads}', '${data.id}', 'Lead')" class="text-red-500 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    return;
-                } catch(e) { console.error(e); }
+                } catch(e) { console.warn("Firebase query failed, launching default elements."); }
             }
-
-            tbody.innerHTML = '';
-            if (localDB.leads.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No session inquiries found. Send one through the home page form!</td></tr>';
-                return;
-            }
-
-            localDB.leads.forEach(data => {
-                tbody.innerHTML += `
-                    <tr class="border-b border-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.02)]">
-                        <td class="p-4 font-bold text-white">${data.name}</td>
-                        <td class="p-4"><span class="px-2 py-1 bg-brand-primary rounded text-xs text-brand-accent">${data.interest}</span></td>
-                        <td class="p-4">${data.email}</td>
-                        <td class="p-4">
-                            <button onclick="deleteDocHandler('local_leads', '${data.id}', 'Lead')" class="text-red-500 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
+            
+            // Build visual local items
+            container.innerHTML = '';
+            localDB.services.forEach(data => {
+                container.innerHTML += `
+                    <div class="glass-card p-8 rounded-2xl hover:-translate-y-2 transition duration-300">
+                        <div class="w-16 h-16 bg-[rgba(255,122,0,0.1)] rounded-2xl flex items-center justify-center text-brand-accent text-3xl mb-6">
+                            <i class="${data.icon}"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">${data.title}</h3>
+                        <p class="text-gray-400">${data.description}</p>
+                    </div>
                 `;
             });
-        };
-
-        window.fetchAdminServices = async function() {
-            const container = document.getElementById('admin-services-grid');
-            
-            const renderAdminServices = (items) => {
-                container.innerHTML = '';
-                window.servicesDataCache = {};
-                items.forEach(data => {
-                    window.servicesDataCache[data.id] = data;
-                    container.innerHTML += `
-                        <div class="glass-card p-6 rounded-xl relative">
-                            <div class="absolute top-4 right-4 flex space-x-2 bg-black bg-opacity-50 p-1 rounded">
-                                <button onclick="editService('${data.id}')" class="text-blue-400 hover:text-blue-300 px-1"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteDocHandler('${PATHS.services}', '${data.id}', 'Service')" class="text-red-500 hover:text-red-400 px-1"><i class="fas fa-trash"></i></button>
-                            </div>
-                            <div class="text-3xl text-brand-accent mb-4"><i class="${data.icon}"></i></div>
-                            <h3 class="text-xl font-bold mb-2">${data.title}</h3>
-                            <p class="text-gray-400 text-sm line-clamp-3">${data.description}</p>
-                        </div>
-                    `;
-                });
-            };
-
-            if (firebaseReady && currentUser) {
-                try {
-                    const snap = await getDocs(collection(db, PATHS.services));
-                    let items = [];
-                    snap.forEach(docSnap => items.push({ id: docSnap.id, ...docSnap.data() }));
-                    renderAdminServices(items);
-                    return;
-                } catch(e) { console.error(e); }
-            }
-            renderAdminServices(localDB.services);
-        };
-
-        window.fetchAdminPortfolio = async function() {
-            const container = document.getElementById('admin-portfolio-grid');
-            
-            const renderAdminPortfolio = (items) => {
-                container.innerHTML = '';
-                window.portfolioDataCache = {}; // Cache to avoid long inline strings
-                
-                items.forEach(data => {
-                    window.portfolioDataCache[data.id] = data;
-                    const mainImg = data.imageMain || data.media; // Backward compatibility
-                    const mediaHtml = mainImg ? `<img src="${mainImg}" class="w-full h-32 object-cover rounded mb-3 border border-gray-700">` : '';
-                    
-                    container.innerHTML += `
-                        <div class="glass-card p-6 rounded-xl relative">
-                            <div class="absolute top-4 right-4 flex space-x-2 bg-black bg-opacity-50 p-1 rounded">
-                                <button onclick="editPortfolio('${data.id}')" class="text-blue-400 hover:text-blue-300 px-1"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteDocHandler('${PATHS.portfolio}', '${data.id}', 'Project')" class="text-red-500 hover:text-red-400 px-1"><i class="fas fa-trash"></i></button>
-                            </div>
-                            ${mediaHtml}
-                            <span class="text-xs bg-brand-secondary px-2 py-1 rounded font-bold">${data.category}</span>
-                            ${data.client ? `<span class="text-xs bg-gray-700 px-2 py-1 rounded ml-2"><i class="fas fa-user"></i> ${data.client}</span>` : ''}
-                            ${data.video ? `<span class="text-xs bg-red-600 px-2 py-1 rounded ml-2"><i class="fas fa-video"></i> Video</span>` : ''}
-                            <h3 class="text-xl font-bold mt-3 mb-2">${data.title}</h3>
-                            <p class="text-gray-400 text-sm line-clamp-2">${data.description}</p>
-                        </div>
-                    `;
-                });
-            };
-
-            if (firebaseReady && currentUser) {
-                try {
-                    const snap = await getDocs(collection(db, PATHS.portfolio));
-                    let items = [];
-                    snap.forEach(docSnap => items.push({ id: docSnap.id, ...docSnap.data() }));
-                    renderAdminPortfolio(items);
-                    return;
-                } catch(e) { console.error(e); }
-            }
-            renderAdminPortfolio(localDB.portfolio);
-        };
-
-        window.fetchAdminPricing = async function() {
-            const container = document.getElementById('admin-pricing-grid');
-            
-            const renderAdminPricing = (items) => {
-                container.innerHTML = '';
-                window.pricingDataCache = {};
-                items.forEach(data => {
-                    window.pricingDataCache[data.id] = data;
-                    const isPop = data.isPopular === true || data.isPopular === 'true';
-                    container.innerHTML += `
-                        <div class="glass-card p-6 rounded-xl relative ${isPop ? 'border border-brand-accent' : ''}">
-                            <div class="absolute top-4 right-4 flex space-x-2 bg-black bg-opacity-50 p-1 rounded">
-                                <button onclick="editPricing('${data.id}')" class="text-blue-400 hover:text-blue-300 px-1"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteDocHandler('${PATHS.pricing}', '${data.id}', 'Package')" class="text-red-500 hover:text-red-400 px-1"><i class="fas fa-trash"></i></button>
-                            </div>
-                            ${isPop ? '<span class="text-xs bg-brand-accent text-white px-2 py-1 rounded font-bold mb-2 inline-block">Popular</span>' : ''}
-                            <h3 class="text-xl font-bold mb-1">${data.title}</h3>
-                            <p class="text-3xl text-white font-bold mb-4">${data.price}</p>
-                            <p class="text-gray-400 text-sm whitespace-pre-line line-clamp-3">${data.features}</p>
-                        </div>
-                    `;
-                });
-            };
-
-            if (firebaseReady && currentUser) {
-                try {
-                    const snap = await getDocs(collection(db, PATHS.pricing));
-                    let items = [];
-                    snap.forEach(docSnap => items.push({ id: docSnap.id, ...docSnap.data() }));
-                    renderAdminPricing(items);
-                    return;
-                } catch(e) { console.error(e); }
-            }
-            renderAdminPricing(localDB.pricing);
-        };
-
-        async function handleServiceSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('s-id').value;
-            const data = {
-                title: document.getElementById('s-title').value,
-                icon: document.getElementById('s-icon').value,
-                description: document.getElementById('s-desc').value
-            };
-            
-            if (firebaseReady && currentUser) {
-                try {
-                    if(id) await updateDoc(doc(db, PATHS.services, id), data);
-                    else await addDoc(collection(db, PATHS.services), data);
-                    
-                    window.closeModals();
-                    window.fetchAdminServices();
-                    showModal("Success", "Service saved successfully on cloud server.");
-                    return;
-                } catch (error) { 
-                    console.error("Firebase write error:", error);
-                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules 
-  "rules": {
-    ".read": true,
-    ".write": true
-  }
-}.");
-                    return;
-                }
-            }
-
-            if (id) {
-                const idx = localDB.services.findIndex(x => x.id === id);
-                if (idx !== -1) localDB.services[idx] = { id, ...data };
-            } else {
-                localDB.services.push({ id: Math.random().toString(), ...data });
-            }
-            window.closeModals();
-            window.fetchAdminServices();
-            showModal("Success", "Service saved locally.");
         }
 
-        async function handlePortfolioSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('p-id').value;
-            const data = {
-                title: document.getElementById('p-title').value,
-                category: document.getElementById('p-category').value,
-                client: document.getElementById('p-client').value,
-                imageMain: document.getElementById('p-image-main').value,
-                video: document.getElementById('p-video').value,
-                img1: document.getElementById('p-img1').value,
-                img2: document.getElementById('p-img2').value,
-                img3: document.getElementById('p-img3').value,
-                img4: document.getElementById('p-img4').value,
-                img5: document.getElementById('p-img5').value,
-                description: document.getElementById('p-desc').value
-            };
+        async function fetchPublicPortfolio() {
+            const container = document.getElementById('public-portfolio-container');
             
-            if (firebaseReady && currentUser) {
-                try {
-                    if(id) await updateDoc(doc(db, PATHS.portfolio, id), data);
-                    else await addDoc(collection(db, PATHS.portfolio), data);
+            const renderPortfolio = (items) => {
+                container.innerHTML = '';
+                items.forEach(data => {
+                    const mainImg = data.imageMain || data.media; // Backward compatibility check
+                    const mediaHtml = mainImg ? `<img src="${mainImg}" alt="${data.title}" class="w-full h-48 object-cover rounded-xl mb-4 border border-[rgba(255,255,255,0.1)]">` : '';
+                    const clientHtml = data.client ? `<span class="text-xs text-gray-400 block mb-2"><i class="fas fa-building mr-1"></i> ${data.client}</span>` : '';
                     
-                    window.closeModals();
-                    window.fetchAdminPortfolio();
-                    showModal("Success", "Project saved successfully on cloud server.");
-                    return;
-                } catch (error) { 
-                    console.error("Firebase write error:", error);
-                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules 
-  "rules": {
-    ".read": true,
-    ".write": true
-  }
-}.");
-                    return;
-                }
-            }
-
-            if (id) {
-                const idx = localDB.portfolio.findIndex(x => x.id === id);
-                if (idx !== -1) localDB.portfolio[idx] = { id, ...data };
-            } else {
-                localDB.portfolio.push({ id: Math.random().toString(), ...data });
-            }
-            window.closeModals();
-            window.fetchAdminPortfolio();
-            showModal("Success", "Project saved locally.");
-        }
-
-        async function handlePricingSubmit(e) {
-            e.preventDefault();
-            const id = document.getElementById('pr-id').value;
-            const data = {
-                title: document.getElementById('pr-title').value,
-                price: document.getElementById('pr-price').value,
-                features: document.getElementById('pr-features').value,
-                buttonText: document.getElementById('pr-btn').value,
-                isPopular: document.getElementById('pr-popular').checked
-            };
-            
-            if (firebaseReady && currentUser) {
-                try {
-                    if(id) await updateDoc(doc(db, PATHS.pricing, id), data);
-                    else await addDoc(collection(db, PATHS.pricing), data);
-                    
-                    window.closeModals();
-                    window.fetchAdminPricing();
-                    showModal("Success", "Package saved successfully on cloud server.");
-                    return;
-                } catch (error) { 
-                    console.error("Firebase write error:", error);
-                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules 
-  "rules": {
-    ".read": true,
-    ".write": true
-  }
-}.");
-                    return;
-                }
-            }
-
-            if (id) {
-                const idx = localDB.pricing.findIndex(x => x.id === id);
-                if (idx !== -1) localDB.pricing[idx] = { id, ...data };
-            } else {
-                localDB.pricing.push({ id: Math.random().toString(), ...data });
-            }
-            window.closeModals();
-            window.fetchAdminPricing();
-            showModal("Success", "Package saved locally.");
-        }
-
-        window.deleteDocHandler = function(path, id, itemName) {
-            document.getElementById('modal-title').innerText = `Delete ${itemName}?`;
-            document.getElementById('modal-message').innerText = `Are you sure you want to delete this item? This action cannot be undone.`;
-            
-            const actions = document.getElementById('modal-actions');
-            actions.innerHTML = `
-                <button id="cancel-del" class="px-6 py-2 border border-gray-500 rounded-lg hover:bg-gray-800 transition text-white">Cancel</button>
-                <button id="confirm-del" class="px-6 py-2 bg-red-600 rounded-lg hover:bg-red-700 font-bold transition text-white">Delete</button>
-            `;
-            
-            document.getElementById('custom-modal').classList.remove('hidden');
-
-            document.getElementById('cancel-del').onclick = () => document.getElementById('custom-modal').classList.add('hidden');
-            document.getElementById('confirm-del').onclick = async () => {
-                document.getElementById('custom-modal').classList.add('hidden');
-                
-                if (path.startsWith('local_') || !firebaseReady) {
-                    if (path.includes('services')) {
-                        localDB.services = localDB.services.filter(x => x.id !== id);
-                        window.fetchAdminServices();
-                    } else if (path.includes('portfolio')) {
-                        localDB.portfolio = localDB.portfolio.filter(x => x.id !== id);
-                        window.fetchAdminPortfolio();
-                    } else if (path.includes('pricing')) {
-                        localDB.pricing = localDB.pricing.filter(x => x.id !== id);
-                        window.fetchAdminPricing();
-                    } else if (path.includes('leads')) {
-                        localDB.leads = localDB.leads.filter(x => x.id !== id);
-                        window.fetchAdminLeads();
+                    // Build optional mini-gallery if extra images exist
+                    let extraImagesHtml = '';
+                    const extras = [data.img1, data.img2, data.img3, data.img4, data.img5].filter(img => img && img.trim() !== '');
+                    if (extras.length > 0) {
+                        extraImagesHtml = `<div class="flex gap-2 overflow-x-auto pb-2 mb-3 snap-x">`;
+                        extras.forEach(img => {
+                            extraImagesHtml += `<img src="${img}" class="h-16 w-16 object-cover rounded shadow-sm snap-start border border-gray-700">`;
+                        });
+                        extraImagesHtml += `</div>`;
                     }
-                    return;
-                }
 
-                try {
-                    await deleteDoc(doc(db, path, id));
-                    if(path.includes('services')) window.fetchAdminServices();
-                    if(path.includes('portfolio')) window.fetchAdminPortfolio();
-                    if(path.includes('pricing')) window.fetchAdminPricing();
-                    if(path.includes('leads')) window.fetchAdminLeads();
-                } catch(e) {
-                    console.error("Cloud delete failed", e);
-                    showModal("Error", "Failed to delete from cloud database.");
-                }
+                    // Build optional Video button
+                    const videoHtml = data.video && data.video.trim() !== '' ? 
+                        `<a href="${data.video}" target="_blank" class="inline-flex items-center justify-center w-full mt-4 py-2 bg-[rgba(255,46,126,0.1)] text-brand-secondary hover:bg-brand-secondary hover:text-white transition rounded-lg text-sm font-bold"><i class="fas fa-play-circle mr-2 text-lg"></i> Watch Project Video</a>` : '';
+                    
+                    container.innerHTML += `
+                        <div class="glass-card p-6 rounded-2xl group hover:border-brand-secondary transition">
+                            ${mediaHtml}
+                            ${extraImagesHtml}
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="inline-block px-3 py-1 bg-[rgba(255,46,126,0.1)] text-brand-secondary text-xs font-bold rounded-full uppercase tracking-wider">${data.category}</div>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-1">${data.title}</h3>
+                            ${clientHtml}
+                            <p class="text-gray-400 text-sm">${data.description}</p>
+                            ${videoHtml}
+                        </div>
+                    `;
+                });
             };
-        };
 
-        window.openServiceForm = function() {
-            document.getElementById('service-form').reset();
-            document.getElementById('s-id').value = '';
-            document.getElementById('form-service-title').innerText = 'Add New Service';
-            document.getElementById('modal-service-form').classList.remove('hidden');
-        };
+            if (firebaseReady && currentUser) {
+                try {
+                  const snap = await get(child(ref(db), "portfolio"));
+                    if (!snap.empty) {
+                        let items = [];
+                        snap.forEach(doc => items.push(doc.data()));
+                        renderPortfolio(items);
+                        return;
+                    }
+                } catch(e) { console.warn("Firebase query failed, deploying default elements."); }
+            }
+            renderPortfolio(localDB.portfolio);
+        }
 
-        window.editService = function(id) {
-            const data = window.servicesDataCache[id];
-            if(!data) return;
-            document.getElementById('s-id').value = id;
-            document.getElementById('s-title').value = data.title || '';
-            document.getElementById('s-icon').value = data.icon || '';
-            document.getElementById('s-desc').value = data.description || '';
-            document.getElementById('form-service-title').innerText = 'Edit Service';
-            document.getElementById('modal-service-form').classList.remove('hidden');
-        };
-
-        window.openPortfolioForm = function() {
-            document.getElementById('portfolio-form').reset();
-            document.getElementById('p-id').value = '';
-            document.getElementById('form-portfolio-title').innerText = 'Add New Project';
-            document.getElementById('modal-portfolio-form').classList.remove('hidden');
-        };
-
-        window.editPortfolio = function(id) {
-            const data = window.portfolioDataCache[id];
-            if(!data) return;
+        async function fetchPublicPricing() {
+            const container = document.getElementById('public-pricing-container');
             
-            document.getElementById('p-id').value = id;
-            document.getElementById('p-title').value = data.title || '';
-            document.getElementById('p-category').value = data.category || '';
-            document.getElementById('p-client').value = data.client || '';
-            document.getElementById('p-image-main').value = data.imageMain || data.media || ''; // Checks both old and new schema
-            document.getElementById('p-video').value = data.video || '';
-            document.getElementById('p-img1').value = data.img1 || '';
-            document.getElementById('p-img2').value = data.img2 || '';
-            document.getElementById('p-img3').value = data.img3 || '';
-            document.getElementById('p-img4').value = data.img4 || '';
-            document.getElementById('p-img5').value = data.img5 || '';
-            document.getElementById('p-desc').value = data.description || '';
-            
-            document.getElementById('form-portfolio-title').innerText = 'Edit Project';
-            document.getElementById('modal-portfolio-form').classList.remove('hidden');
-        };
+            const renderPricing = (items) => {
+                container.innerHTML = '';
+                items.forEach((data, index) => {
+                    const isPop = data.isPopular || data.isPopular === 'true';
+                    const featuresList = data.features.split('\n').filter(f => f.trim() !== '').map(f => `<li><i class="fas fa-check text-green-400 mr-2"></i> ${f}</li>`).join('');
+                    
+                    const classes = isPop ? 
+                        `glass-card p-8 rounded-2xl text-center border-brand-accent transform md:-translate-y-4 shadow-[0_0_30px_rgba(255,122,0,0.2)] relative fade-in-up delay-${index * 100}` : 
+                        `glass-card p-8 rounded-2xl text-center fade-in-up delay-${index * 100}`;
+                        
+                    const badgeHtml = isPop ? `<div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-brand-accent text-white px-4 py-1 rounded-full text-sm font-bold">Most Popular</div>` : '';
+                    const btnClass = isPop ? `bg-brand-accent text-white hover:bg-[#FF5500] shadow-lg` : (index === 2 ? `border border-brand-secondary text-brand-secondary hover:bg-brand-secondary hover:text-white` : `border border-brand-accent text-brand-accent hover:bg-brand-accent hover:text-white`);
 
-        window.openPricingForm = function() {
-            document.getElementById('pricing-form').reset();
-            document.getElementById('pr-id').value = '';
-            document.getElementById('form-pricing-title').innerText = 'Add New Package';
-            document.getElementById('modal-pricing-form').classList.remove('hidden');
-        };
+                    container.innerHTML += `
+                        <div class="${classes}">
+                            ${badgeHtml}
+                            <h3 class="text-2xl font-bold mb-2">${data.title}</h3>
+                            <p class="text-4xl font-extrabold ${isPop ? 'text-brand-accent' : (index===2 ? 'text-brand-secondary' : 'text-brand-accent')} mb-6">${data.price}</p>
+                            <ul class="text-left space-y-4 mb-8 text-gray-300">
+                                ${featuresList}
+                            </ul>
+                            <a href="#contact" class="block w-full py-3 rounded-lg transition text-center font-bold ${btnClass}">${data.buttonText || 'Select'}</a>
+                        </div>
+                    `;
+                });
+            };
 
-        window.editPricing = function(id) {
-            const data = window.pricingDataCache[id];
-            if(!data) return;
-            document.getElementById('pr-id').value = id;
-            document.getElementById('pr-title').value = data.title || '';
-            document.getElementById('pr-price').value = data.price || '';
-            document.getElementById('pr-features').value = data.features || '';
-            document.getElementById('pr-btn').value = data.buttonText || '';
-            document.getElementById('pr-popular').checked = data.isPopular === true || data.isPopular === 'true';
-            document.getElementById('form-pricing-title').innerText = 'Edit Package';
-            document.getElementById('modal-pricing-form').classList.remove('hidden');
-        };
+            if (firebaseReady && currentUser) {
+                try {
+                    const snap = await get(child(ref(db), "pricing"));
+                    if (!snap.empty) {
+                        let items = [];
+                        snap.forEach(doc => items.push(doc.data()));
+                        // Sort simply by putting popular in the middle if possible, or leave as created
+                        renderPricing(items);
+                        return;
+                    }
+                } catch(e) { console.warn("Firebase query failed, deploying default elements."); }
+            }
+            renderPricing(localDB.pricing);
+        }
 
         window.closeModals = function() {
-            document.querySelectorAll('[id^="modal-"]').forEach(m => m.classList.add('hidden'));
             document.getElementById('custom-modal').classList.add('hidden');
         };
 
+        // Custom Modal Alert Box (No alerts used)
         function showModal(title, message) {
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-message').innerText = message;
