@@ -598,42 +598,36 @@
 
         window.fetchAdminServices = async function() {
             const container = document.getElementById('admin-services-grid');
+            
+            const renderAdminServices = (items) => {
+                container.innerHTML = '';
+                window.servicesDataCache = {};
+                items.forEach(data => {
+                    window.servicesDataCache[data.id] = data;
+                    container.innerHTML += `
+                        <div class="glass-card p-6 rounded-xl relative">
+                            <div class="absolute top-4 right-4 flex space-x-2 bg-black bg-opacity-50 p-1 rounded">
+                                <button onclick="editService('${data.id}')" class="text-blue-400 hover:text-blue-300 px-1"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteDocHandler('${PATHS.services}', '${data.id}', 'Service')" class="text-red-500 hover:text-red-400 px-1"><i class="fas fa-trash"></i></button>
+                            </div>
+                            <div class="text-3xl text-brand-accent mb-4"><i class="${data.icon}"></i></div>
+                            <h3 class="text-xl font-bold mb-2">${data.title}</h3>
+                            <p class="text-gray-400 text-sm line-clamp-3">${data.description}</p>
+                        </div>
+                    `;
+                });
+            };
+
             if (firebaseReady && currentUser) {
                 try {
                     const snap = await getDocs(collection(db, PATHS.services));
-                    container.innerHTML = '';
-                    snap.forEach(docSnap => {
-                        const data = docSnap.data();
-                        container.innerHTML += `
-                            <div class="glass-card p-6 rounded-xl relative">
-                                <div class="absolute top-4 right-4 flex space-x-2">
-                                    <button onclick="editService('${docSnap.id}', '${data.title.replace(/'/g,"\\'")}', '${data.icon}', '${data.description.replace(/'/g,"\\'")}')" class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
-                                    <button onclick="deleteDocHandler('${PATHS.services}', '${docSnap.id}', 'Service')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
-                                </div>
-                                <div class="text-3xl text-brand-accent mb-4"><i class="${data.icon}"></i></div>
-                                <h3 class="text-xl font-bold mb-2">${data.title}</h3>
-                                <p class="text-gray-400 text-sm line-clamp-3">${data.description}</p>
-                            </div>
-                        `;
-                    });
+                    let items = [];
+                    snap.forEach(docSnap => items.push({ id: docSnap.id, ...docSnap.data() }));
+                    renderAdminServices(items);
                     return;
                 } catch(e) { console.error(e); }
             }
-
-            container.innerHTML = '';
-            localDB.services.forEach(data => {
-                container.innerHTML += `
-                    <div class="glass-card p-6 rounded-xl relative">
-                        <div class="absolute top-4 right-4 flex space-x-2">
-                            <button onclick="editService('${data.id}', '${data.title.replace(/'/g,"\\'")}', '${data.icon}', '${data.description.replace(/'/g,"\\'")}')" class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteDocHandler('local_services', '${data.id}', 'Service')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
-                        </div>
-                        <div class="text-3xl text-brand-accent mb-4"><i class="${data.icon}"></i></div>
-                        <h3 class="text-xl font-bold mb-2">${data.title}</h3>
-                        <p class="text-gray-400 text-sm line-clamp-3">${data.description}</p>
-                    </div>
-                `;
-            });
+            renderAdminServices(localDB.services);
         };
 
         window.fetchAdminPortfolio = async function() {
@@ -682,13 +676,15 @@
             
             const renderAdminPricing = (items) => {
                 container.innerHTML = '';
+                window.pricingDataCache = {};
                 items.forEach(data => {
+                    window.pricingDataCache[data.id] = data;
                     const isPop = data.isPopular === true || data.isPopular === 'true';
                     container.innerHTML += `
                         <div class="glass-card p-6 rounded-xl relative ${isPop ? 'border border-brand-accent' : ''}">
-                            <div class="absolute top-4 right-4 flex space-x-2">
-                                <button onclick="editPricing('${data.id}', '${(data.title||'').replace(/'/g,"\\'")}', '${(data.price||'').replace(/'/g,"\\'")}', '${(data.features||'').replace(/\n/g,"\\n").replace(/'/g,"\\'")}', '${(data.buttonText||'').replace(/'/g,"\\'")}', ${isPop})" class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteDocHandler('${PATHS.pricing}', '${data.id}', 'Package')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                            <div class="absolute top-4 right-4 flex space-x-2 bg-black bg-opacity-50 p-1 rounded">
+                                <button onclick="editPricing('${data.id}')" class="text-blue-400 hover:text-blue-300 px-1"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteDocHandler('${PATHS.pricing}', '${data.id}', 'Package')" class="text-red-500 hover:text-red-400 px-1"><i class="fas fa-trash"></i></button>
                             </div>
                             ${isPop ? '<span class="text-xs bg-brand-accent text-white px-2 py-1 rounded font-bold mb-2 inline-block">Popular</span>' : ''}
                             <h3 class="text-xl font-bold mb-1">${data.title}</h3>
@@ -729,7 +725,11 @@
                     window.fetchAdminServices();
                     showModal("Success", "Service saved successfully on cloud server.");
                     return;
-                } catch (error) { console.error(error); }
+                } catch (error) { 
+                    console.error("Firebase write error:", error);
+                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules allow writes.");
+                    return;
+                }
             }
 
             if (id) {
@@ -769,7 +769,11 @@
                     window.fetchAdminPortfolio();
                     showModal("Success", "Project saved successfully on cloud server.");
                     return;
-                } catch (error) { console.error(error); }
+                } catch (error) { 
+                    console.error("Firebase write error:", error);
+                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules allow writes.");
+                    return;
+                }
             }
 
             if (id) {
@@ -803,7 +807,11 @@
                     window.fetchAdminPricing();
                     showModal("Success", "Package saved successfully on cloud server.");
                     return;
-                } catch (error) { console.error(error); }
+                } catch (error) { 
+                    console.error("Firebase write error:", error);
+                    showModal("Save Blocked", "Failed to save to cloud. Ensure your Firestore Rules allow writes.");
+                    return;
+                }
             }
 
             if (id) {
@@ -870,11 +878,13 @@
             document.getElementById('modal-service-form').classList.remove('hidden');
         };
 
-        window.editService = function(id, title, icon, desc) {
+        window.editService = function(id) {
+            const data = window.servicesDataCache[id];
+            if(!data) return;
             document.getElementById('s-id').value = id;
-            document.getElementById('s-title').value = title;
-            document.getElementById('s-icon').value = icon;
-            document.getElementById('s-desc').value = desc;
+            document.getElementById('s-title').value = data.title || '';
+            document.getElementById('s-icon').value = data.icon || '';
+            document.getElementById('s-desc').value = data.description || '';
             document.getElementById('form-service-title').innerText = 'Edit Service';
             document.getElementById('modal-service-form').classList.remove('hidden');
         };
@@ -914,13 +924,15 @@
             document.getElementById('modal-pricing-form').classList.remove('hidden');
         };
 
-        window.editPricing = function(id, title, price, features, buttonText, isPopular) {
+        window.editPricing = function(id) {
+            const data = window.pricingDataCache[id];
+            if(!data) return;
             document.getElementById('pr-id').value = id;
-            document.getElementById('pr-title').value = title;
-            document.getElementById('pr-price').value = price;
-            document.getElementById('pr-features').value = features;
-            document.getElementById('pr-btn').value = buttonText;
-            document.getElementById('pr-popular').checked = isPopular;
+            document.getElementById('pr-title').value = data.title || '';
+            document.getElementById('pr-price').value = data.price || '';
+            document.getElementById('pr-features').value = data.features || '';
+            document.getElementById('pr-btn').value = data.buttonText || '';
+            document.getElementById('pr-popular').checked = data.isPopular === true || data.isPopular === 'true';
             document.getElementById('form-pricing-title').innerText = 'Edit Package';
             document.getElementById('modal-pricing-form').classList.remove('hidden');
         };
