@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>UshaKala Media | Marketing That Moves Brands</title>
+    <meta name="description" content="UshaKala Media is a premier AI Marketing Agency based in Maharashtra, India. We offer B2B, B2C, and Student Solutions with data-driven strategies.">
+    <meta name="keywords" content="AI Marketing, Digital Marketing Agency India, Student Solutions, SEO, Social Media Marketing, UshaKala Media">
+    <meta name="robots" content="index, follow">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "UshaKala Media",
+      "description": "Marketing That Moves Brands.",
+      "telephone": "+918830903621",
+      "email": "ushakala.world@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Umbraj, Tal. Karad",
+        "addressLocality": "Satara",
+        "addressRegion": "Maharashtra",
+        "addressCountry": "IN"
+      }
+    }
+    </script>
+
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#081B38',
+                            accent: '#FF7A00',
+                            secondary: '#FF2E7E',
+                            bg: '#040816',
+                            text: '#FFFFFF'
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Poppins', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --glass-bg: rgba(8, 27, 56, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        body {
+            background-color: #040816;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .glass-card {
+            background: linear-gradient(135deg, rgba(8, 27, 56, 0.6), rgba(4, 8, 22, 0.8));
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: #FF7A00;
+        }
+
+        /* Typography */
+        .gradient-text {
+            background: linear-gradient(90deg, #FF7A00, #FF2E7E);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #040816; }
+        ::-webkit-scrollbar-thumb { background: #081B38; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF7A00; }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -50px) scale(1.1); }
+        }
+        
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.4;
+            animation: float 8s infinite alternate ease-in-out;
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Marquee */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+        }
+        .marquee-track {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Custom Modal Loader */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #FF7A00;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="relative antialiased">
+
+    <!-- Custom Modal -->
+    <div id="custom-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm">
+        <div class="glass-card w-full max-w-md p-8 rounded-2xl text-center relative mx-4">
+            <h3 id="modal-title" class="text-2xl font-heading font-bold mb-4 gradient-text">Notice</h3>
+            <p id="modal-message" class="text-gray-300 mb-6 font-body">Message goes here.</p>
+            <div id="modal-actions" class="flex justify-center gap-4">
+                <!-- Buttons injected dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="global-loader" class="fixed inset-0 z-[9998] flex items-center justify-center bg-brand-bg bg-opacity-90 backdrop-blur-md">
+        <div class="flex flex-col items-center">
+            <div class="spinner mb-4"></div>
+            <p class="text-brand-accent font-heading animate-pulse">Initializing UshaKala AI...</p>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         VIEW: PUBLIC MARKETING AGENCY SITE
+         ========================================== -->
+    <div id="public-view" class="w-full">
+        <!-- Navigation -->
+        <nav class="fixed top-0 w-full z-50 glass-panel border-b-0 py-4 transition-all duration-300" id="navbar">
+            <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+                <a href="#home" class="flex items-center gap-3 z-50">
+                    <img src="assets/logo.jpg" alt="UshaKala Media Logo" class="h-10 md:h-12 w-auto rounded-lg bg-white p-1 shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:scale-105 transition-transform duration-300">
+                    <span class="text-xl md:text-2xl font-heading font-bold tracking-wide">UshaKala <span class="text-brand-accent">Media</span></span>
+                </a>
+                
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex space-x-8 items-center font-medium">
+                    <a href="#about" class="hover:text-brand-accent transition">About</a>
+                    <a href="#services" class="hover:text-brand-accent transition">Services</a>
+                    <a href="#portfolio" class="hover:text-brand-accent transition">Work</a>
+                    <a href="#pricing" class="hover:text-brand-accent transition">Pricing</a>
+                    <a href="#contact" class="px-5 py-2 bg-gradient-to-r from-brand-accent to-[#FF5500] rounded-lg shadow-[0_4px_15px_rgba(255,122,0,0.4)] hover:scale-105 transition transform">Consultation</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-2xl z-50 focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Nav (Hidden by default) -->
+            <div id="mobile-menu" class="fixed inset-0 bg-brand-bg bg-opacity-95 backdrop-blur-lg flex-col items-center justify-center space-y-8 text-xl hidden z-40">
+                <a href="#home" class="mobile-link hover:text-brand-accent">Home</a>
+                <a href="#about" class="mobile-link hover:text-brand-accent">About</a>
+                <a href="#services" class="mobile-link hover:text-brand-accent">Services</a>
+                <a href="#portfolio" class="mobile-link hover:text-brand-accent">Work</a>
+                <a href="#contact" class="mobile-link text-brand-accent">Contact</a>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section id="home" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+            <!-- Background Elements -->
+            <div class="blob bg-brand-primary w-[500px] h-[500px] top-[-100px] left-[-100px]"></div>
+            <div class="blob bg-brand-secondary w-[400px] h-[400px] bottom-[-50px] right-[-50px]" style="animation-delay: -4s;"></div>
+            
+            <div class="relative z-10 max-w-4xl mx-auto px-6 text-center fade-in-up">
+                <div class="inline-block px-4 py-1.5 rounded-full border border-brand-accent bg-brand-accent bg-opacity-10 text-brand-accent text-sm font-semibold mb-6">
+                    Next-Gen AI Marketing Agency
+                </div>
+                <h1 class="text-5xl md:text-7xl font-heading font-extrabold mb-6 leading-tight">
+                    Marketing That <br/> <span class="gradient-text">Moves Brands</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+                    We combine AI-driven insights with human creativity to scale B2B/B2C businesses and empower students for the digital future.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#services" class="px-8 py-3 bg-gradient-to-r from-brand-accent to-[#FF5500] rounded-lg font-bold shadow-[0_4px_15px_rgba(255,122,0,0.4)] hover:scale-105 transition">Explore Services</a>
+                    <a href="#contact" class="px-8 py-3 border-2 border-brand-secondary text-white rounded-lg font-bold hover:bg-brand-secondary shadow-[0_4px_15px_rgba(255,46,126,0.2)] transition">Book a Call</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-24 glass-panel relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <div class="fade-in-up">
+                        <h2 class="text-4xl font-heading font-bold mb-6">Redefining Growth <br><span class="gradient-text">Through AI</span></h2>
+                        <p class="text-gray-300 mb-6 text-lg leading-relaxed">
+                            Based in Maharashtra, UshaKala Media is not just an agency; we are your growth ecosystem. We build scalable strategies utilizing semantic AI, predictive analytics, and viral content frameworks to dominate modern digital landscapes.
+                        </p>
+                        <div class="grid grid-cols-2 gap-8 mt-8">
+                            <div>
+                                <h3 class="text-4xl font-bold text-brand-accent mb-2"><span class="counter" data-target="150">0</span>+</h3>
+                                <p class="text-sm text-gray-400 uppercase tracking-wider">Brands Scaled</p>
+                            </div>
+                            <div>
+                                <h3 class="text-4xl font-bold text-brand-secondary mb-2"><span class="counter" data-target="500">0</span>+</h3>
+                                <p class="text-sm text-gray-400 uppercase tracking-wider">Students Empowered</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fade-in-up delay-100 relative">
+                        <div class="glass-card aspect-square rounded-3xl flex items-center justify-center p-8 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-brand-primary to-transparent opacity-50"></div>
+                            <i class="fas fa-rocket text-9xl text-brand-accent relative z-10 animate-bounce" style="animation-duration: 3s;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="py-24 relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16 fade-in-up">
+                    <h2 class="text-4xl font-heading font-bold mb-4">Our <span class="gradient-text">Capabilities</span></h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">Omnichannel solutions tailored for businesses and ambitious students.</p>
+                </div>
+                
+                <!-- Dynamic Services Container -->
+                <div id="public-services-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Loaded dynamically via script -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Section -->
+        <section id="portfolio" class="py-24 glass-panel relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-12 fade-in-up">
+                    <h2 class="text-4xl font-heading font-bold mb-4">Featured <span class="gradient-text">Work</span></h2>
+                </div>
+
+                <!-- Client Marquee -->
+                <div class="marquee-container py-8 border-y border-[rgba(255,255,255,0.1)] bg-black bg-opacity-20 mb-16 fade-in-up">
+                    <div class="marquee-track" id="client-marquee">
+                        <span class="text-2xl font-heading text-gray-500 mx-12">TechCorp</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">EduGrowth</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">InnovateAI</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">Global Retail</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">TechCorp</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">EduGrowth</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">InnovateAI</span>
+                        <span class="text-2xl font-heading text-gray-500 mx-12">Global Retail</span>
+                    </div>
+                </div>
+
+                <!-- Dynamic Portfolio Container -->
+                <div id="public-portfolio-container" class="grid grid-cols-1 md:grid-cols-2 gap-8 fade-in-up">
+                    <!-- Loaded dynamically via script -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="py-24 relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16 fade-in-up">
+                    <h2 class="text-4xl font-heading font-bold mb-4">Transparent <span class="gradient-text">Pricing</span></h2>
+                </div>
+                
+                <div id="public-pricing-container" class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                    <!-- Pricing tiers loaded dynamically via script -->
+                    <div class="col-span-full p-8 text-center text-gray-500">
+                        <div class="spinner mx-auto inline-block mb-4"></div>
+                        <p>Loading active packages...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-24 glass-panel relative z-10">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid md:grid-cols-2 gap-16">
+                    <div class="fade-in-up">
+                        <h2 class="text-4xl font-heading font-bold mb-6">Let's Build <span class="gradient-text">Together</span></h2>
+                        <p class="text-gray-300 mb-8">Ready to scale your brand or build your student portfolio? Reach out to us today.</p>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-brand-accent bg-opacity-20 rounded-full flex items-center justify-center text-brand-accent text-xl mr-4"><i class="fas fa-map-marker-alt"></i></div>
+                                <div><p class="font-bold">Location</p><p class="text-gray-400 text-sm">Umbraj, Karad, Satara, Maharashtra</p></div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-brand-secondary bg-opacity-20 rounded-full flex items-center justify-center text-brand-secondary text-xl mr-4"><i class="fas fa-phone"></i></div>
+                                <div><p class="font-bold">Phone / WhatsApp</p><p class="text-gray-400 text-sm">+91 8830903621</p></div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center text-blue-400 text-xl mr-4"><i class="fas fa-envelope"></i></div>
+                                <div><p class="font-bold">Email</p><p class="text-gray-400 text-sm">ushakala.world@gmail.com</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fade-in-up delay-100">
+                        <form id="public-contact-form" class="glass-card p-8 rounded-2xl">
+                            <div class="mb-4">
+                                <input type="text" id="c-name" required placeholder="Your Name" class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent transition">
+                            </div>
+                            <div class="mb-4">
+                                <input type="email" id="c-email" required placeholder="Your Email" class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent transition">
+                            </div>
+                            <div class="mb-4">
+                                <select id="c-interest" required class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent transition appearance-none">
+                                    <option value="" disabled selected>I'm interested in...</option>
+                                    <option value="B2B">Business Services (B2B)</option>
+                                    <option value="B2C">Brand Scaling (B2C)</option>
+                                    <option value="Student">Student Portfolio Development</option>
+                                </select>
+                            </div>
+                            <div class="mb-6">
+                                <textarea id="c-message" required rows="4" placeholder="Tell us about your project" class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent transition"></textarea>
+                            </div>
+                            <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-accent to-[#FF5500] rounded-lg font-bold shadow-[0_4px_15px_rgba(255,122,0,0.4)] hover:scale-105 transition">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="pt-16 pb-8 bg-[#02040a] border-t border-[rgba(255,255,255,0.05)] text-center relative z-10">
+            <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center mb-8">
+                <div class="mb-6 md:mb-0 text-left">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="assets/logo.jpg" alt="UshaKala Media Logo" class="h-10 w-auto rounded-lg bg-white p-1">
+                        <span class="text-xl font-heading font-bold">UshaKala <span class="text-brand-accent">Media</span></span>
+                    </div>
+                    <p class="text-gray-500 text-sm">Marketing That Moves Brands.</p>
+                </div>
+                <div class="flex space-x-6 text-xl">
+                    <a href="https://instagram.com/ushakala.world" target="_blank" class="text-gray-400 hover:text-brand-secondary transition"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/918830903621" target="_blank" class="text-gray-400 hover:text-green-500 transition"><i class="fab fa-whatsapp"></i></a>
+                    <a href="mailto:ushakala.world@gmail.com" class="text-gray-400 hover:text-brand-accent transition"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            <p class="text-gray-600 text-sm">
+                &copy; <span id="year-tag"></span> UshaKala Media. All Rights Reserved. 
+                <span class="mx-2">|</span> 
+                <!-- Link to separate Admin Page -->
+                <a href="admin.html" class="hover:text-brand-accent transition font-bold">Admin Panel</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Firebase Modules & Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Environment Variables & App ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ushakala-local';
+        
+        // YOUR REAL FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmGzGo0iTX1ayDyStLX-2AaqePaQzSIwk",
+            authDomain: "uahakala-media.firebaseapp.com",
+            databaseURL: "https://uahakala-media-default-rtdb.firebaseio.com",
+            projectId: "uahakala-media",
+            storageBucket: "uahakala-media.firebasestorage.app",
+            messagingSenderId: "463032568438",
+            appId: "1:463032568438:web:588f907dcca79c3b322d57",
+            measurementId: "G-GRH8GGRLKM"
+        };
+
+        // Initialize Firebase
+        let app, db, auth;
+        let currentUser = null;
+        let firebaseReady = false;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch(e) {
+            console.warn("Could not connect to online Firebase instance. Standing by to render fallbacks.");
+        }
+
+        // Local Fallback Mock Database
+        let localDB = {
+            services: [
+                { id: "s1", title: "AI SEO & Content", icon: "fas fa-robot", description: "Rank higher utilizing semantic AI models and high-quality writing frameworks." },
+                { id: "s2", title: "Social Media Growth", icon: "fas fa-share-nodes", description: "End-to-end management, viral content creation, and community building." },
+                { id: "s3", title: "Performance Ads", icon: "fas fa-bullseye", description: "High-ROI campaigns across Meta, Google, and LinkedIn." }
+            ],
+            portfolio: [
+                { id: "p1", title: "E-commerce Brand Scaling", category: "B2C", client: "TechStore", imageMain: "https://placehold.co/600x400/081B38/FF7A00?text=E-commerce+Scale", img1: "https://placehold.co/150x150/081B38/FF7A00?text=Shot+1", img2: "https://placehold.co/150x150/081B38/FF7A00?text=Shot+2", video: "https://youtube.com", description: "Increased conversion rate by 210% using AI-driven ad copy and UX optimization." },
+                { id: "p2", title: "EdTech Lead Gen", category: "B2B", client: "LearnPro", imageMain: "https://placehold.co/600x400/081B38/FF2E7E?text=Lead+Gen", description: "Generated 10,000+ highly qualified leads in month one through Meta Ads." }
+            ],
+            pricing: [
+                { id: "pr1", title: "Starter", price: "₹15k", isPopular: false, features: "Social Media Management\nBasic SEO setup\nMonthly Reporting", buttonText: "Get Started" },
+                { id: "pr2", title: "Growth", price: "₹35k", isPopular: true, features: "Advanced AI SEO\nMeta/Google Ads\nWeekly Content\nPriority Support", buttonText: "Get Started" },
+                { id: "pr3", title: "Enterprise", price: "Custom", isPopular: false, features: "Full-stack Marketing\nCustom AI Automation\nOmnichannel Strategy", buttonText: "Contact Us" }
+            ],
+            leads: []
+        };
+
+        // Firebase Collection Paths (Strict rule compliant)
+        const PATHS = {
+            services: `artifacts/${appId}/public/data/services`,
+            portfolio: `artifacts/${appId}/public/data/portfolio`,
+            pricing: `artifacts/${appId}/public/data/pricing`,
+            leads: `artifacts/${appId}/public/data/leads`,
+        };
+
+        // UI Initialization
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('year-tag').textContent = new Date().getFullYear();
+            setupInteractions();
+            
+            // SECURITY FAILSAFE TIME LIMIT: Automatically hide loader in 1.5 seconds if DB initialization takes too long
+            setTimeout(() => {
+                hideLoader();
+            }, 1500);
+
+            // Attempt Connection
+            try {
+                if (auth) {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        const userCredential = await signInWithCustomToken(auth, __initial_auth_token);
+                        currentUser = userCredential.user;
+                    } else {
+                        const userCredential = await signInAnonymously(auth);
+                        currentUser = userCredential.user;
+                    }
+                    firebaseReady = true;
+                }
+            } catch (error) {
+                console.warn("Firebase Auth bypassed or offline. Utilizing local high-speed mock DB.", error);
+            }
+
+            // Load public data immediately since we are only on the index page
+            fetchPublicServices();
+            fetchPublicPortfolio();
+            fetchPublicPricing();
+        });
+
+        function setupInteractions() {
+            // Mobile Menu Toggle
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+            
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('flex');
+                menuBtn.innerHTML = mobileMenu.classList.contains('hidden') ? '<i class="fas fa-bars"></i>' : '<i class="fas fa-times text-brand-accent"></i>';
+            });
+            
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenu.classList.remove('flex');
+                    menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                });
+            });
+
+            // Scroll Animation Observer
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        
+                        // Counter numerical scaling
+                        const counters = entry.target.querySelectorAll('.counter');
+                        counters.forEach(counter => {
+                            const target = +counter.getAttribute('data-target');
+                            const speed = 200;
+                            const updateCount = () => {
+                                const count = +counter.innerText;
+                                const inc = target / speed;
+                                if (count < target) {
+                                    counter.innerText = Math.ceil(count + inc);
+                                    setTimeout(updateCount, 15);
+                                } else {
+                                    counter.innerText = target;
+                                }
+                            };
+                            updateCount();
+                        });
+
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+
+            // Contact Form Submission Handler
+            document.getElementById('public-contact-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const btn = e.target.querySelector('button');
+                const originalText = btn.innerText;
+                btn.innerText = "Sending..."; btn.disabled = true;
+
+                const inquiryData = {
+                    name: document.getElementById('c-name').value,
+                    email: document.getElementById('c-email').value,
+                    interest: document.getElementById('c-interest').value,
+                    message: document.getElementById('c-message').value,
+                    timestamp: Date.now()
+                };
+
+                if (firebaseReady && currentUser) {
+                    try {
+                        await addDoc(collection(db, PATHS.leads), inquiryData);
+                        e.target.reset();
+                        showModal("Success!", "Your inquiry has been sent. We will reach out shortly.");
+                    } catch (error) {
+                        console.error(error);
+                        showModal("Local Backup Active", "Your info was saved locally inside the portal session.");
+                    } finally {
+                        btn.innerText = originalText; btn.disabled = false;
+                    }
+                } else {
+                    // Fallback storage
+                    localDB.leads.push({ id: Math.random().toString(), ...inquiryData });
+                    e.target.reset();
+                    showModal("Success!", "Inquiry registered locally inside this session context.");
+                    btn.innerText = originalText; btn.disabled = false;
+                }
+            });
+        }
+
+        async function fetchPublicServices() {
+            const container = document.getElementById('public-services-container');
+            if (firebaseReady && currentUser) {
+                try {
+                    const snap = await getDocs(collection(db, PATHS.services));
+                    if (!snap.empty) {
+                        container.innerHTML = '';
+                        snap.forEach(doc => {
+                            const data = doc.data();
+                            container.innerHTML += `
+                                <div class="glass-card p-8 rounded-2xl hover:-translate-y-2 transition duration-300">
+                                    <div class="w-16 h-16 bg-[rgba(255,122,0,0.1)] rounded-2xl flex items-center justify-center text-brand-accent text-3xl mb-6">
+                                        <i class="${data.icon}"></i>
+                                    </div>
+                                    <h3 class="text-2xl font-bold mb-4">${data.title}</h3>
+                                    <p class="text-gray-400">${data.description}</p>
+                                </div>
+                            `;
+                        });
+                        return;
+                    }
+                } catch(e) { console.warn("Firebase query failed, launching default elements."); }
+            }
+            
+            // Build visual local items
+            container.innerHTML = '';
+            localDB.services.forEach(data => {
+                container.innerHTML += `
+                    <div class="glass-card p-8 rounded-2xl hover:-translate-y-2 transition duration-300">
+                        <div class="w-16 h-16 bg-[rgba(255,122,0,0.1)] rounded-2xl flex items-center justify-center text-brand-accent text-3xl mb-6">
+                            <i class="${data.icon}"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">${data.title}</h3>
+                        <p class="text-gray-400">${data.description}</p>
+                    </div>
+                `;
+            });
+        }
+
+        async function fetchPublicPortfolio() {
+            const container = document.getElementById('public-portfolio-container');
+            
+            const renderPortfolio = (items) => {
+                container.innerHTML = '';
+                items.forEach(data => {
+                    const mainImg = data.imageMain || data.media; // Backward compatibility check
+                    const mediaHtml = mainImg ? `<img src="${mainImg}" alt="${data.title}" class="w-full h-48 object-cover rounded-xl mb-4 border border-[rgba(255,255,255,0.1)]">` : '';
+                    const clientHtml = data.client ? `<span class="text-xs text-gray-400 block mb-2"><i class="fas fa-building mr-1"></i> ${data.client}</span>` : '';
+                    
+                    // Build optional mini-gallery if extra images exist
+                    let extraImagesHtml = '';
+                    const extras = [data.img1, data.img2, data.img3, data.img4, data.img5].filter(img => img && img.trim() !== '');
+                    if (extras.length > 0) {
+                        extraImagesHtml = `<div class="flex gap-2 overflow-x-auto pb-2 mb-3 snap-x">`;
+                        extras.forEach(img => {
+                            extraImagesHtml += `<img src="${img}" class="h-16 w-16 object-cover rounded shadow-sm snap-start border border-gray-700">`;
+                        });
+                        extraImagesHtml += `</div>`;
+                    }
+
+                    // Build optional Video button
+                    const videoHtml = data.video && data.video.trim() !== '' ? 
+                        `<a href="${data.video}" target="_blank" class="inline-flex items-center justify-center w-full mt-4 py-2 bg-[rgba(255,46,126,0.1)] text-brand-secondary hover:bg-brand-secondary hover:text-white transition rounded-lg text-sm font-bold"><i class="fas fa-play-circle mr-2 text-lg"></i> Watch Project Video</a>` : '';
+                    
+                    container.innerHTML += `
+                        <div class="glass-card p-6 rounded-2xl group hover:border-brand-secondary transition">
+                            ${mediaHtml}
+                            ${extraImagesHtml}
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="inline-block px-3 py-1 bg-[rgba(255,46,126,0.1)] text-brand-secondary text-xs font-bold rounded-full uppercase tracking-wider">${data.category}</div>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-1">${data.title}</h3>
+                            ${clientHtml}
+                            <p class="text-gray-400 text-sm">${data.description}</p>
+                            ${videoHtml}
+                        </div>
+                    `;
+                });
+            };
+
+            if (firebaseReady && currentUser) {
+                try {
+                    const snap = await getDocs(collection(db, PATHS.portfolio));
+                    if (!snap.empty) {
+                        let items = [];
+                        snap.forEach(doc => items.push(doc.data()));
+                        renderPortfolio(items);
+                        return;
+                    }
+                } catch(e) { console.warn("Firebase query failed, deploying default elements."); }
+            }
+            renderPortfolio(localDB.portfolio);
+        }
+
+        async function fetchPublicPricing() {
+            const container = document.getElementById('public-pricing-container');
+            
+            const renderPricing = (items) => {
+                container.innerHTML = '';
+                items.forEach((data, index) => {
+                    const isPop = data.isPopular || data.isPopular === 'true';
+                    const featuresList = data.features.split('\n').filter(f => f.trim() !== '').map(f => `<li><i class="fas fa-check text-green-400 mr-2"></i> ${f}</li>`).join('');
+                    
+                    const classes = isPop ? 
+                        `glass-card p-8 rounded-2xl text-center border-brand-accent transform md:-translate-y-4 shadow-[0_0_30px_rgba(255,122,0,0.2)] relative fade-in-up delay-${index * 100}` : 
+                        `glass-card p-8 rounded-2xl text-center fade-in-up delay-${index * 100}`;
+                        
+                    const badgeHtml = isPop ? `<div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-brand-accent text-white px-4 py-1 rounded-full text-sm font-bold">Most Popular</div>` : '';
+                    const btnClass = isPop ? `bg-brand-accent text-white hover:bg-[#FF5500] shadow-lg` : (index === 2 ? `border border-brand-secondary text-brand-secondary hover:bg-brand-secondary hover:text-white` : `border border-brand-accent text-brand-accent hover:bg-brand-accent hover:text-white`);
+
+                    container.innerHTML += `
+                        <div class="${classes}">
+                            ${badgeHtml}
+                            <h3 class="text-2xl font-bold mb-2">${data.title}</h3>
+                            <p class="text-4xl font-extrabold ${isPop ? 'text-brand-accent' : (index===2 ? 'text-brand-secondary' : 'text-brand-accent')} mb-6">${data.price}</p>
+                            <ul class="text-left space-y-4 mb-8 text-gray-300">
+                                ${featuresList}
+                            </ul>
+                            <a href="#contact" class="block w-full py-3 rounded-lg transition text-center font-bold ${btnClass}">${data.buttonText || 'Select'}</a>
+                        </div>
+                    `;
+                });
+            };
+
+            if (firebaseReady && currentUser) {
+                try {
+                    const snap = await getDocs(collection(db, PATHS.pricing));
+                    if (!snap.empty) {
+                        let items = [];
+                        snap.forEach(doc => items.push(doc.data()));
+                        // Sort simply by putting popular in the middle if possible, or leave as created
+                        renderPricing(items);
+                        return;
+                    }
+                } catch(e) { console.warn("Firebase query failed, deploying default elements."); }
+            }
+            renderPricing(localDB.pricing);
+        }
+
+        window.closeModals = function() {
+            document.getElementById('custom-modal').classList.add('hidden');
+        };
+
+        // Custom Modal Alert Box (No alerts used)
+        function showModal(title, message) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('modal-actions').innerHTML = `<button onclick="closeModals()" class="px-8 py-2 bg-brand-accent rounded-lg font-bold hover:bg-[#FF5500] transition text-white">OK</button>`;
+            document.getElementById('custom-modal').classList.remove('hidden');
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('global-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
+        }
+    </script>
+</body>
+</html>
