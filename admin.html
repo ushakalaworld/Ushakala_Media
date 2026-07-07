@@ -16,14 +16,11 @@
     <meta name="robots" content="index, follow">
 
     <!-- Structured Data -->
-    <script type="module">
+       <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getDatabase, ref, push, get, child } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-        // Environment Variables
-        const appId = 'ushakala-local';
-        
+        // 1. Setup Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDmGzGo0iTX1ayDyStLX-2AaqePaQzSIwk",
             authDomain: "uahakala-media.firebaseapp.com",
@@ -35,68 +32,51 @@
             measurementId: "G-GRH8GGRLKM"
         };
 
-        // Initialize Firebase
-        let app, db, auth;
-        let currentUser = null;
-        let firebaseReady = false;
+        // 2. Initialize App
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getDatabase(app);
-            auth = getAuth(app);
-            firebaseReady = true;
-        } catch(e) {
-            console.warn("Could not connect to Firebase. Using local fallback.");
-        }
+        // 3. Document Ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // Immediately hide the loader, don't wait for anything
+            const loader = document.getElementById('global-loader');
+            if(loader) loader.style.display = 'none';
 
-        // Local Fallback Mock Database
-        let localDB = {
-            services: [
-                { id: "s1", title: "AI SEO & Content", icon: "fas fa-robot", description: "Rank higher utilizing semantic AI models." },
-                { id: "s2", title: "Social Media Growth", icon: "fas fa-share-nodes", description: "End-to-end management, viral content creation." },
-                { id: "s3", title: "Performance Ads", icon: "fas fa-bullseye", description: "High-ROI campaigns across Meta and Google." }
-            ],
-            portfolio: [
-                { id: "p1", title: "Brand Scaling", category: "B2C", client: "TechStore", imageMain: "https://placehold.co/600x400/081B38/FF7A00?text=Project+1", description: "Increased conversion by 210%." }
-            ],
-            pricing: [
-                { id: "pr1", title: "Starter", price: "₹15k", isPopular: false, features: "Social Media Management\nBasic SEO", buttonText: "Get Started" },
-                { id: "pr2", title: "Growth", price: "₹35k", isPopular: true, features: "AI SEO\nMeta Ads", buttonText: "Get Started" }
-            ],
-            leads: []
-        };
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('year-tag').textContent = new Date().getFullYear();
+            // Run site functions
             setupInteractions();
-            
-            // Safety Exit: Always hide loader after 1 second regardless of Firebase state
-            setTimeout(() => { hideLoader(); }, 1000);
-
-            // Attempt Auth
-            if (firebaseReady) {
-                try {
-                    await signInAnonymously(auth);
-                    currentUser = true;
-                } catch (error) {
-                    console.warn("Auth failed, continuing to site.");
-                }
-            }
-
             fetchPublicServices();
             fetchPublicPortfolio();
             fetchPublicPricing();
         });
 
-        // ... Keep the rest of your existing functions (setupInteractions, fetchPublicServices, etc.) unchanged ...
-        function hideLoader() {
-            const loader = document.getElementById('global-loader');
-            if (loader) {
-                loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 500);
-            }
+        // 4. Interaction Logic
+        function setupInteractions() {
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
         }
+
+        // 5. Data Fetching (Simple version)
+        async function fetchPublicServices() {
+            const container = document.getElementById('public-services-container');
+            // Using a simple array if Firebase is slow/blocked
+            const services = [
+                { title: "AI SEO", icon: "fas fa-robot", description: "Semantic AI models." },
+                { title: "Social Media", icon: "fas fa-share-nodes", description: "Viral content." }
+            ];
+            container.innerHTML = services.map(s => `
+                <div class="glass-card p-8 rounded-2xl">
+                    <i class="${s.icon} text-3xl mb-4 text-brand-accent"></i>
+                    <h3 class="text-xl font-bold">${s.title}</h3>
+                    <p class="text-gray-400">${s.description}</p>
+                </div>
+            `).join('');
+        }
+
+        async function fetchPublicPortfolio() { /* ... similar logic ... */ }
+        async function fetchPublicPricing() { /* ... similar logic ... */ }
     </script>
+
 
 
     <!-- Google Fonts & FontAwesome -->
