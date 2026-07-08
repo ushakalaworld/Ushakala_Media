@@ -185,26 +185,29 @@
 
     <!-- Script / Database Logic -->
     <script type="module">
-        // Import Firestore (Correct Database service)
+        // Import Firebase Realtime Database
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getDatabase, ref, push, get, update, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         // 1. Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDmGzGo0iTX1ayDyStLX-2AaqePaQzSIwk",
             authDomain: "uahakala-media.firebaseapp.com",
+            databaseURL: "https://uahakala-media-default-rtdb.firebaseio.com",
             projectId: "uahakala-media",
             storageBucket: "uahakala-media.firebasestorage.app",
             messagingSenderId: "463032568438",
             appId: "1:463032568438:web:588f907dcca79c3b322d57"
         };
 
-        // 2. Initialize
-        let app, db, auth;
+        // 2. Initialize Safely Globally
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
         let isConnected = false;
+        window.adminData = { services: {}, portfolio: {}, pricing: {} }; // Holds data for editing
 
-        // Using simple root collections for your custom database
+        // Using simple root collections for Realtime Database
         const COL_SERVICES = "services";
         const COL_PORTFOLIO = "portfolio";
         const COL_PRICING = "pricing";
@@ -222,30 +225,52 @@
             document.getElementById(tabId).classList.add('active');
         };
 
-        // Login Logic
+        // Edit Item Global Function
+        window.editItem = (collectionName, id) => {
+            const data = window.adminData[collectionName][id];
+            if (!data) return;
+
+            if (collectionName === COL_SERVICES) {
+                switchTab('tab-services');
+                document.getElementById('s-id').value = id;
+                document.getElementById('s-title').value = data.title;
+                document.getElementById('s-icon').value = data.icon;
+                document.getElementById('s-desc').value = data.description;
+            } else if (collectionName === COL_PORTFOLIO) {
+                switchTab('tab-portfolio');
+                document.getElementById('p-id').value = id;
+                document.getElementById('p-title').value = data.title;
+                document.getElementById('p-category').value = data.category || '';
+                document.getElementById('p-client').value = data.client || '';
+                document.getElementById('p-image-main').value = data.imageMain || '';
+                document.getElementById('p-video').value = data.video || '';
+                document.getElementById('p-img1').value = data.img1 || '';
+                document.getElementById('p-img2').value = data.img2 || '';
+                document.getElementById('p-img3').value = data.img3 || '';
+                document.getElementById('p-img4').value = data.img4 || '';
+                document.getElementById('p-img5').value = data.img5 || '';
+                document.getElementById('p-desc').value = data.description || '';
+            } else if (collectionName === COL_PRICING) {
+                switchTab('tab-pricing');
+                document.getElementById('pr-id').value = id;
+                document.getElementById('pr-title').value = data.title;
+                document.getElementById('pr-price').value = data.price;
+                document.getElementById('pr-btn').value = data.buttonText || '';
+                document.getElementById('pr-popular').checked = data.isPopular || false;
+                document.getElementById('pr-features').value = data.features || '';
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // Login Logic (No Firebase Auth Required)
         window.checkPassword = async () => {
             const pass = document.getElementById('admin-pass').value;
             if (pass === "Yashraj@234") {
                 document.getElementById('login-overlay').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 
-                // Initialize Firebase only after login
-                try {
-                    app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
-                    
-                    // Attempt Anonymous Login
-                    await signInAnonymously(auth);
-                    isConnected = true;
-                    
-                    // Fetch all data
-                    fetchAllData();
-
-                } catch (error) {
-                    console.error("Firebase Init Error:", error);
-                    showAlert("Authentication Error", "Could not connect to Firebase Auth. Please make sure Anonymous Sign-in is enabled in your Firebase Console.");
-                }
+                isConnected = true;
+                fetchAllData();
             } else {
                 document.getElementById('login-error').classList.remove('hidden');
             }
@@ -277,15 +302,19 @@
             };
 
             try {
-                if(id) await updateDoc(doc(db, COL_SERVICES, id), data);
-                else await addDoc(collection(db, COL_SERVICES), data);
+                if(id) {
+                    await update(ref(db, COL_SERVICES + '/' + id), data);
+                } else {
+                    await push(ref(db, COL_SERVICES), data);
+                }
                 
                 e.target.reset();
                 document.getElementById('s-id').value = "";
                 loadServices();
                 showAlert("Success", "Service saved successfully.");
             } catch (err) {
-                showAlert("Database Blocked", "Failed to save. Ensure Firestore Rules are set to 'allow read, write: if true;'");
+                console.error(err);
+                showAlert("Database Error", "Failed to save. Check database rules.");
             } finally {
                 btn.innerText = "Save Service"; btn.disabled = false;
             }
@@ -294,19 +323,25 @@
         async function loadServices() {
             const list = document.getElementById('list-services');
             try {
-                const snap = await getDocs(collection(db, COL_SERVICES));
+                const snap = await get(ref(db, COL_SERVICES));
                 list.innerHTML = "";
-                if(snap.empty) { list.innerHTML = "<p class='text-gray-500'>No services found.</p>"; return; }
+                window.adminData.services = {};
+                if(!snap.exists()) { list.innerHTML = "<p class='text-gray-500'>No services found.</p>"; return; }
                 
-                snap.forEach(docSnap => {
-                    const d = docSnap.data();
+                snap.forEach(childSnap => {
+                    const d = childSnap.val();
+                    const id = childSnap.key;
+                    window.adminData.services[id] = d;
                     list.innerHTML += `
                         <div class="glass-panel p-4 rounded-lg flex justify-between items-center">
                             <div>
                                 <i class="${d.icon} text-brand-accent mr-3"></i>
                                 <span class="font-bold">${d.title}</span>
                             </div>
-                            <button onclick="deleteItem('${COL_SERVICES}', '${docSnap.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                            <div>
+                                <button onclick="editItem('${COL_SERVICES}', '${id}')" class="text-blue-400 hover:text-blue-300 mr-4"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('${COL_SERVICES}', '${id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                            </div>
                         </div>
                     `;
                 });
@@ -339,15 +374,19 @@
             };
 
             try {
-                if(id) await updateDoc(doc(db, COL_PORTFOLIO, id), data);
-                else await addDoc(collection(db, COL_PORTFOLIO), data);
+                if(id) {
+                    await update(ref(db, COL_PORTFOLIO + '/' + id), data);
+                } else {
+                    await push(ref(db, COL_PORTFOLIO), data);
+                }
                 
                 e.target.reset();
                 document.getElementById('p-id').value = "";
                 loadPortfolio();
                 showAlert("Success", "Project saved successfully.");
             } catch (err) {
-                showAlert("Database Blocked", "Failed to save. Ensure Firestore Rules are set to 'allow read, write: if true;'");
+                console.error(err);
+                showAlert("Database Error", "Failed to save. Check database rules.");
             } finally {
                 btn.innerText = "Save Project"; btn.disabled = false;
             }
@@ -356,12 +395,15 @@
         async function loadPortfolio() {
             const list = document.getElementById('list-portfolio');
             try {
-                const snap = await getDocs(collection(db, COL_PORTFOLIO));
+                const snap = await get(ref(db, COL_PORTFOLIO));
                 list.innerHTML = "";
-                if(snap.empty) { list.innerHTML = "<p class='text-gray-500'>No projects found.</p>"; return; }
+                window.adminData.portfolio = {};
+                if(!snap.exists()) { list.innerHTML = "<p class='text-gray-500'>No projects found.</p>"; return; }
                 
-                snap.forEach(docSnap => {
-                    const d = docSnap.data();
+                snap.forEach(childSnap => {
+                    const d = childSnap.val();
+                    const id = childSnap.key;
+                    window.adminData.portfolio[id] = d;
                     list.innerHTML += `
                         <div class="glass-panel p-4 rounded-lg flex justify-between items-center">
                             <div class="flex items-center gap-3 truncate">
@@ -371,7 +413,10 @@
                                     <p class="text-xs text-brand-accent">${d.category}</p>
                                 </div>
                             </div>
-                            <button onclick="deleteItem('${COL_PORTFOLIO}', '${docSnap.id}')" class="text-red-500 hover:text-red-400 ml-4"><i class="fas fa-trash"></i></button>
+                            <div>
+                                <button onclick="editItem('${COL_PORTFOLIO}', '${id}')" class="text-blue-400 hover:text-blue-300 mr-4"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('${COL_PORTFOLIO}', '${id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                            </div>
                         </div>
                     `;
                 });
@@ -398,15 +443,19 @@
             };
 
             try {
-                if(id) await updateDoc(doc(db, COL_PRICING, id), data);
-                else await addDoc(collection(db, COL_PRICING), data);
+                if(id) {
+                    await update(ref(db, COL_PRICING + '/' + id), data);
+                } else {
+                    await push(ref(db, COL_PRICING), data);
+                }
                 
                 e.target.reset();
                 document.getElementById('pr-id').value = "";
                 loadPricing();
                 showAlert("Success", "Pricing package saved successfully.");
             } catch (err) {
-                showAlert("Database Blocked", "Failed to save. Ensure Firestore Rules are set to 'allow read, write: if true;'");
+                console.error(err);
+                showAlert("Database Error", "Failed to save. Check database rules.");
             } finally {
                 btn.innerText = "Save Pricing Package"; btn.disabled = false;
             }
@@ -415,18 +464,24 @@
         async function loadPricing() {
             const list = document.getElementById('list-pricing');
             try {
-                const snap = await getDocs(collection(db, COL_PRICING));
+                const snap = await get(ref(db, COL_PRICING));
                 list.innerHTML = "";
-                if(snap.empty) { list.innerHTML = "<p class='text-gray-500'>No pricing packages found.</p>"; return; }
+                window.adminData.pricing = {};
+                if(!snap.exists()) { list.innerHTML = "<p class='text-gray-500'>No pricing packages found.</p>"; return; }
                 
-                snap.forEach(docSnap => {
-                    const d = docSnap.data();
+                snap.forEach(childSnap => {
+                    const d = childSnap.val();
+                    const id = childSnap.key;
+                    window.adminData.pricing[id] = d;
                     const popBadge = d.isPopular ? `<span class="bg-brand-accent text-white text-xs px-2 py-1 rounded ml-2">Popular</span>` : '';
                     list.innerHTML += `
                         <div class="glass-panel p-4 rounded-lg relative">
                             <h4 class="font-bold text-lg mb-1">${d.title} ${popBadge}</h4>
                             <p class="text-2xl text-brand-secondary mb-4">${d.price}</p>
-                            <button onclick="deleteItem('${COL_PRICING}', '${docSnap.id}')" class="absolute top-4 right-4 text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                            <div class="absolute top-4 right-4 flex space-x-3">
+                                <button onclick="editItem('${COL_PRICING}', '${id}')" class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('${COL_PRICING}', '${id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                            </div>
                         </div>
                     `;
                 });
@@ -439,7 +494,7 @@
         window.deleteItem = async (collectionName, id) => {
             if(!confirm("Are you sure you want to delete this item?")) return;
             try {
-                await deleteDoc(doc(db, collectionName, id));
+                await remove(ref(db, collectionName + '/' + id));
                 if(collectionName === COL_SERVICES) loadServices();
                 if(collectionName === COL_PORTFOLIO) loadPortfolio();
                 if(collectionName === COL_PRICING) loadPricing();
