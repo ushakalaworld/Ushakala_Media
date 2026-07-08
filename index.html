@@ -92,6 +92,25 @@
         </div>
     </section>
 
+    <!-- About Section -->
+    <section id="about" class="py-24 glass-panel relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="fade-in-up">
+                    <h2 class="text-4xl font-heading font-bold mb-6">Redefining Growth <br><span class="gradient-text">Through AI</span></h2>
+                    <p class="text-gray-300 mb-6 text-lg leading-relaxed">
+                        Based in Maharashtra, UshaKala Media is your growth ecosystem. We build scalable strategies utilizing semantic AI, predictive analytics, and viral content frameworks to dominate modern digital landscapes.
+                    </p>
+                </div>
+                <div class="fade-in-up delay-100">
+                    <div class="glass-card aspect-square rounded-3xl flex items-center justify-center p-8 relative overflow-hidden">
+                        <i class="fas fa-rocket text-9xl text-brand-accent animate-bounce" style="animation-duration: 3s;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Services Section -->
     <section id="services" class="py-24 relative z-10">
         <div class="max-w-7xl mx-auto px-6">
@@ -129,6 +148,49 @@
         </div>
     </section>
 
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 glass-panel relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16">
+                <div class="fade-in-up">
+                    <h2 class="text-4xl font-heading font-bold mb-6">Let's Build <span class="gradient-text">Together</span></h2>
+                    <p class="text-gray-300 mb-8">Ready to scale your brand or build your student portfolio? Reach out to us today.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-brand-accent bg-opacity-20 rounded-full flex items-center justify-center text-brand-accent text-xl mr-4"><i class="fas fa-map-marker-alt"></i></div>
+                            <div><p class="font-bold">Location</p><p class="text-gray-400 text-sm">Umbraj, Karad, Satara, Maharashtra</p></div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-brand-secondary bg-opacity-20 rounded-full flex items-center justify-center text-brand-secondary text-xl mr-4"><i class="fas fa-phone"></i></div>
+                            <div><p class="font-bold">Phone / WhatsApp</p><p class="text-gray-400 text-sm">+91 8830903621</p></div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center text-blue-400 text-xl mr-4"><i class="fas fa-envelope"></i></div>
+                            <div><p class="font-bold">Email</p><p class="text-gray-400 text-sm">ushakala.world@gmail.com</p></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="fade-in-up delay-100">
+                    <form id="contact-form" class="glass-card p-8 rounded-2xl">
+                        <div class="mb-4">
+                            <input type="text" id="c-name" required placeholder="Your Name" class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent transition">
+                        </div>
+                        <div class="mb-4">
+                            <input type="email" id="c-email" required placeholder="Your Email" class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent transition">
+                        </div>
+                        <div class="mb-6">
+                            <textarea id="c-message" required rows="4" placeholder="Tell us about your project" class="w-full bg-black bg-opacity-30 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-brand-accent transition"></textarea>
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-brand-accent to-[#FF5500] rounded-lg font-bold shadow-[0_4px_15px_rgba(255,122,0,0.4)] hover:scale-105 transition">Send Message</button>
+                        <p id="contact-status" class="mt-4 text-center hidden font-bold"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="pt-16 pb-8 bg-[#02040a] border-t border-[rgba(255,255,255,0.05)] text-center relative z-10">
         <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center mb-8">
@@ -150,7 +212,7 @@
     <!-- Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, get, push } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDmGzGo0iTX1ayDyStLX-2AaqePaQzSIwk",
@@ -191,6 +253,37 @@
             fetchServices();
             fetchPortfolio();
             fetchPricing();
+            
+            // Contact Form Submit Handler
+            const contactForm = document.getElementById('contact-form');
+            if(contactForm) {
+                contactForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = contactForm.querySelector('button');
+                    const status = document.getElementById('contact-status');
+                    btn.innerText = 'Sending...';
+                    btn.disabled = true;
+                    
+                    try {
+                        await push(ref(db, "inquiries"), {
+                            name: document.getElementById('c-name').value,
+                            email: document.getElementById('c-email').value,
+                            message: document.getElementById('c-message').value,
+                            timestamp: Date.now()
+                        });
+                        status.innerText = "Message sent successfully!";
+                        status.className = "mt-4 text-center text-green-400 font-bold block";
+                        contactForm.reset();
+                    } catch (error) {
+                        status.innerText = "Error sending message. Try calling us!";
+                        status.className = "mt-4 text-center text-red-400 font-bold block";
+                    } finally {
+                        btn.innerText = 'Send Message';
+                        btn.disabled = false;
+                        setTimeout(() => status.classList.add('hidden'), 5000);
+                    }
+                });
+            }
         });
 
         async function fetchServices() {
@@ -212,7 +305,7 @@
                         `;
                     });
                 } else {
-                    container.innerHTML = '<p class="text-gray-500 text-center col-span-full">No services available right now.</p>';
+                    container.innerHTML = '<p class="text-gray-500 text-center col-span-full">Information will be updated soon.</p>';
                 }
             } catch(e) { console.error("Error fetching services", e); }
         }
@@ -234,7 +327,7 @@
                         `;
                     });
                 } else {
-                    container.innerHTML = '<p class="text-gray-500 text-center col-span-full">Portfolio coming soon.</p>';
+                    container.innerHTML = '<p class="text-gray-500 text-center col-span-full">Information will be updated soon.</p>';
                 }
             } catch(e) { console.error("Error fetching portfolio", e); }
         }
@@ -251,19 +344,19 @@
                         const features = data.features.split('\n').filter(f => f.trim() !== '').map(f => `<li><i class="fas fa-check text-green-400 mr-2"></i> ${f}</li>`).join('');
                         
                         container.innerHTML += `
-                            <div class="glass-card p-8 rounded-2xl text-center ${isPop ? 'border-brand-accent shadow-[0_0_30px_rgba(255,122,0,0.2)] md:-translate-y-4' : ''}">
+                            <div class="glass-card p-8 rounded-2xl text-center flex flex-col h-full ${isPop ? 'border-brand-accent shadow-[0_0_30px_rgba(255,122,0,0.2)] md:-translate-y-4' : ''}">
                                 ${isPop ? '<div class="bg-brand-accent text-white px-4 py-1 rounded-full text-sm font-bold w-max mx-auto mb-4">Most Popular</div>' : ''}
                                 <h3 class="text-2xl font-bold mb-2">${data.title}</h3>
                                 <p class="text-4xl font-extrabold text-brand-accent mb-6">${data.price}</p>
-                                <ul class="text-left space-y-4 mb-8 text-gray-300">
+                                <ul class="text-left space-y-4 mb-8 text-gray-300 flex-grow">
                                     ${features}
                                 </ul>
-                                <a href="#contact" class="block w-full py-3 rounded-lg border border-brand-accent text-brand-accent hover:bg-brand-accent hover:text-white transition font-bold">${data.buttonText}</a>
+                                <a href="#contact" class="block w-full py-3 rounded-lg border border-brand-accent text-brand-accent hover:bg-brand-accent hover:text-white transition font-bold text-center mt-auto">${data.buttonText}</a>
                             </div>
                         `;
                     });
                 } else {
-                    container.innerHTML = '<p class="text-gray-500 text-center col-span-full">Pricing packages are currently being updated.</p>';
+                    container.innerHTML = '<p class="text-gray-500 text-center col-span-full">Information will be updated soon.</p>';
                 }
             } catch(e) { console.error("Error fetching pricing", e); }
         }
