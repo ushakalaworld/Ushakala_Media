@@ -433,6 +433,143 @@
         }
 
         // ==========================================
+        // PORTFOLIO CRUD
+        // ==========================================
+        document.getElementById('form-portfolio').addEventListener('submit', async (e) => {
+            e.preventDefault(); // <-- THIS stops the page from reloading!
+            if(!isConnected) return showAlert("Error", "Not connected to database.");
+            
+            const btn = e.target.querySelector('button');
+            btn.innerText = "Saving..."; btn.disabled = true;
+
+            const id = document.getElementById('p-id').value;
+            const data = {
+                title: document.getElementById('p-title').value,
+                category: document.getElementById('p-category').value,
+                client: document.getElementById('p-client').value,
+                video: document.getElementById('p-video').value,
+                imageMain: document.getElementById('p-image-main').value,
+                img1: document.getElementById('p-img1').value,
+                img2: document.getElementById('p-img2').value,
+                img3: document.getElementById('p-img3').value,
+                img4: document.getElementById('p-img4').value,
+                img5: document.getElementById('p-img5').value,
+                description: document.getElementById('p-desc').value
+            };
+
+            try {
+                if(id) {
+                    await update(ref(db, COL_PORTFOLIO + '/' + id), data);
+                } else {
+                    await push(ref(db, COL_PORTFOLIO), data);
+                }
+                
+                e.target.reset();
+                document.getElementById('p-id').value = "";
+                loadPortfolio();
+                showAlert("Success", "Project saved successfully.");
+            } catch (err) {
+                console.error(err);
+                showAlert("Database Error", "Failed to save.");
+            } finally {
+                btn.innerText = "Save Project"; btn.disabled = false;
+            }
+        });
+
+        async function loadPortfolio() {
+            const list = document.getElementById('list-portfolio');
+            try {
+                const snap = await get(ref(db, COL_PORTFOLIO));
+                list.innerHTML = "";
+                window.adminData.portfolio = {};
+                if(!snap.exists()) { list.innerHTML = "<p class='text-gray-500'>No projects found.</p>"; return; }
+                
+                snap.forEach(childSnap => {
+                    const d = childSnap.val();
+                    const id = childSnap.key;
+                    window.adminData.portfolio[id] = d;
+                    list.innerHTML += `
+                        <div class="glass-panel p-4 rounded-lg flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <img src="${d.imageMain || 'https://placehold.co/100x100'}" class="w-12 h-12 object-cover rounded border border-gray-600">
+                                <span class="font-bold">${d.title}</span>
+                            </div>
+                            <div>
+                                <button onclick="editItem('${COL_PORTFOLIO}', '${id}')" class="text-blue-400 hover:text-blue-300 mr-4"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('${COL_PORTFOLIO}', '${id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) { list.innerHTML = `<p class="text-red-500">Error loading data.</p>`; }
+        }
+
+        // ==========================================
+        // PRICING CRUD
+        // ==========================================
+        document.getElementById('form-pricing').addEventListener('submit', async (e) => {
+            e.preventDefault(); // <-- THIS stops the page from reloading!
+            if(!isConnected) return showAlert("Error", "Not connected to database.");
+            
+            const btn = e.target.querySelector('button');
+            btn.innerText = "Saving..."; btn.disabled = true;
+
+            const id = document.getElementById('pr-id').value;
+            const data = {
+                title: document.getElementById('pr-title').value,
+                price: document.getElementById('pr-price').value,
+                buttonText: document.getElementById('pr-btn').value,
+                isPopular: document.getElementById('pr-popular').checked,
+                features: document.getElementById('pr-features').value
+            };
+
+            try {
+                if(id) {
+                    await update(ref(db, COL_PRICING + '/' + id), data);
+                } else {
+                    await push(ref(db, COL_PRICING), data);
+                }
+                
+                e.target.reset();
+                document.getElementById('pr-id').value = "";
+                loadPricing();
+                showAlert("Success", "Pricing package saved successfully.");
+            } catch (err) {
+                console.error(err);
+                showAlert("Database Error", "Failed to save.");
+            } finally {
+                btn.innerText = "Save Pricing Package"; btn.disabled = false;
+            }
+        });
+
+        async function loadPricing() {
+            const list = document.getElementById('list-pricing');
+            try {
+                const snap = await get(ref(db, COL_PRICING));
+                list.innerHTML = "";
+                window.adminData.pricing = {};
+                if(!snap.exists()) { list.innerHTML = "<p class='text-gray-500'>No pricing packages found.</p>"; return; }
+                
+                snap.forEach(childSnap => {
+                    const d = childSnap.val();
+                    const id = childSnap.key;
+                    window.adminData.pricing[id] = d;
+                    const popBadge = d.isPopular ? `<span class="bg-brand-accent text-white text-xs px-2 py-1 rounded ml-2">Popular</span>` : '';
+                    list.innerHTML += `
+                        <div class="glass-panel p-4 rounded-lg relative">
+                            <h4 class="font-bold text-lg mb-1">${d.title} ${popBadge}</h4>
+                            <p class="text-2xl text-brand-secondary mb-4">${d.price}</p>
+                            <div class="absolute top-4 right-4">
+                                <button onclick="editItem('${COL_PRICING}', '${id}')" class="text-blue-400 hover:text-blue-300 mr-4"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('${COL_PRICING}', '${id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) { list.innerHTML = `<p class="text-red-500">Error loading data.</p>`; }
+        }
+
+        // ==========================================
         // OFFERS CRUD
         // ==========================================
         document.getElementById('form-offers').addEventListener('submit', async (e) => {
