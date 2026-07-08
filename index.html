@@ -75,12 +75,20 @@
             </a>
             
             <!-- Desktop Nav -->
-            <div class="hidden md:flex space-x-8 items-center font-medium">
+            <div class="hidden md:flex space-x-6 items-center font-medium">
                 <a href="#about" class="hover:text-brand-accent transition">About</a>
                 <a href="#services" class="hover:text-brand-accent transition">Services</a>
                 <a href="#portfolio" class="hover:text-brand-accent transition">Work</a>
                 <a href="#pricing" class="hover:text-brand-accent transition">Pricing</a>
-                <a href="#contact" class="px-5 py-2 bg-gradient-to-r from-brand-accent to-[#FF5500] rounded-lg shadow-[0_4px_15px_rgba(255,122,0,0.4)] hover:scale-105 transition transform">Consultation</a>
+                
+                <!-- Social Icons Moved to Top Navbar -->
+                <div class="flex items-center space-x-4 border-l border-[rgba(255,255,255,0.2)] pl-6 ml-2">
+                    <a href="https://instagram.com/ushakala.world" target="_blank" class="text-gray-400 hover:text-brand-secondary transition text-xl" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/918830903621" target="_blank" class="text-gray-400 hover:text-green-500 transition text-xl" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="mailto:ushakala.world@gmail.com" class="text-gray-400 hover:text-brand-accent transition text-xl" title="Email Us"><i class="fas fa-envelope"></i></a>
+                </div>
+
+                <a href="#contact" class="px-5 py-2 bg-gradient-to-r from-brand-accent to-[#FF5500] rounded-lg shadow-[0_4px_15px_rgba(255,122,0,0.4)] hover:scale-105 transition transform ml-2">Consultation</a>
             </div>
 
             <!-- Mobile Menu Button -->
@@ -93,6 +101,13 @@
             <a href="#services" class="mobile-link hover:text-brand-accent">Services</a>
             <a href="#portfolio" class="mobile-link hover:text-brand-accent">Work</a>
             <a href="#contact" class="mobile-link text-brand-accent">Contact</a>
+            
+            <!-- Social Icons in Mobile Menu -->
+            <div class="flex space-x-8 mt-8 pt-8 border-t border-[rgba(255,255,255,0.1)] w-1/2 justify-center">
+                <a href="https://instagram.com/ushakala.world" target="_blank" class="text-gray-400 hover:text-brand-secondary transition text-3xl"><i class="fab fa-instagram"></i></a>
+                <a href="https://wa.me/918830903621" target="_blank" class="text-gray-400 hover:text-green-500 transition text-3xl"><i class="fab fa-whatsapp"></i></a>
+                <a href="mailto:ushakala.world@gmail.com" class="text-gray-400 hover:text-brand-accent transition text-3xl"><i class="fas fa-envelope"></i></a>
+            </div>
         </div>
     </nav>
 
@@ -169,6 +184,14 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16 fade-in-up">
                 <h2 class="text-4xl font-heading font-bold mb-4">Transparent <span class="gradient-text">Pricing</span></h2>
+                
+                <!-- NEW Pricing Search Bar -->
+                <div class="max-w-md mx-auto mt-8 relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-brand-accent"></i>
+                    </div>
+                    <input type="text" id="pricing-search" placeholder="Search packages or features (e.g. SEO, Meta Ads)..." class="w-full bg-black bg-opacity-40 border border-gray-700 rounded-full py-3 pl-12 pr-4 text-white focus:outline-none focus:border-brand-accent transition shadow-lg backdrop-blur-sm">
+                </div>
             </div>
             <div id="public-pricing-container" class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
                 <!-- Pricing loaded dynamically -->
@@ -230,18 +253,12 @@
     <!-- Footer -->
     <footer class="pt-16 pb-8 bg-[#02040a] border-t border-[rgba(255,255,255,0.05)] text-center relative z-10">
         <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center mb-8">
-            <div class="mb-6 md:mb-0 text-left">
+            <div class="mb-6 md:mb-0 text-left w-full md:w-auto flex flex-col items-center md:items-start">
                 <div class="flex items-center gap-3 mb-4">
                     <img src="assets/logo.jpg" alt="UshaKala Media Logo" class="h-10 w-auto rounded-lg bg-white p-1">
                     <span class="text-xl font-heading font-bold">UshaKala <span class="text-brand-accent">Media</span></span>
                 </div>
                 <p class="text-gray-500 text-sm">Marketing That Moves Brands.</p>
-            </div>
-            
-            <div class="flex space-x-6 text-xl">
-                <a href="https://instagram.com/ushakala.world" target="_blank" class="text-gray-400 hover:text-brand-secondary transition"><i class="fab fa-instagram"></i></a>
-                <a href="https://wa.me/918830903621" target="_blank" class="text-gray-400 hover:text-green-500 transition"><i class="fab fa-whatsapp"></i></a>
-                <a href="mailto:ushakala.world@gmail.com" class="text-gray-400 hover:text-brand-accent transition"><i class="fas fa-envelope"></i></a>
             </div>
         </div>
         <p class="text-gray-500 text-sm mb-2">
@@ -302,6 +319,27 @@
             fetchPricing();
             fetchOffers();
             fetchLegal();
+            
+            // Pricing Live Search Logic
+            const pricingSearch = document.getElementById('pricing-search');
+            if(pricingSearch) {
+                pricingSearch.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    const pricingCards = document.querySelectorAll('#public-pricing-container > div');
+                    
+                    pricingCards.forEach(card => {
+                        // Ensure we are filtering cards and not the "Loading..." text
+                        if(card.querySelector('.fa-check') || card.querySelector('h3')) {
+                            const textContent = card.innerText.toLowerCase();
+                            if (textContent.includes(term)) {
+                                card.style.display = ''; // Shows the package
+                            } else {
+                                card.style.display = 'none'; // Hides the package
+                            }
+                        }
+                    });
+                });
+            }
             
             // Contact Form Submit Handler
             const contactForm = document.getElementById('contact-form');
