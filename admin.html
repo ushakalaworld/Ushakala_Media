@@ -92,6 +92,7 @@
                 <button onclick="switchTab('tab-portfolio')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-[rgba(255,122,0,0.1)] hover:text-brand-accent transition font-bold"><i class="fas fa-briefcase w-6"></i> Manage Portfolio</button>
                 <button onclick="switchTab('tab-pricing')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-[rgba(255,122,0,0.1)] hover:text-brand-accent transition font-bold"><i class="fas fa-tags w-6"></i> Manage Pricing</button>
                 <button onclick="switchTab('tab-offers')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-[rgba(255,122,0,0.1)] hover:text-brand-accent transition font-bold"><i class="fas fa-gift w-6"></i> Manage Offers</button>
+                <button onclick="switchTab('tab-legal')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-[rgba(255,122,0,0.1)] hover:text-brand-accent transition font-bold"><i class="fas fa-file-contract w-6"></i> Manage Policies</button>
             </nav>
             <div class="p-4 border-t border-[rgba(255,255,255,0.1)]">
                 <a href="index.html" class="block w-full text-center px-4 py-2 border border-gray-600 rounded-lg hover:bg-gray-800 transition text-sm">Return to Website</a>
@@ -199,6 +200,23 @@
                 <div id="list-offers" class="grid grid-cols-1 gap-4">
                     <p class="text-gray-500">Loading data...</p>
                 </div>
+            </section>
+
+            <!-- LEGAL/POLICIES TAB -->
+            <section id="tab-legal" class="tab-content max-w-4xl mx-auto">
+                <h1 class="text-3xl font-bold mb-8">Manage <span class="text-brand-accent">Policies</span></h1>
+                
+                <form id="form-legal" class="glass-panel p-6 rounded-2xl mb-8 space-y-6">
+                    <div>
+                        <label class="block text-brand-accent font-bold mb-2">Terms & Conditions</label>
+                        <textarea id="l-terms" rows="8" placeholder="Paste your Terms and Conditions here..." class="w-full p-3 rounded-lg glass-input"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-brand-accent font-bold mb-2">Privacy Policy</label>
+                        <textarea id="l-privacy" rows="8" placeholder="Paste your Privacy Policy here..." class="w-full p-3 rounded-lg glass-input"></textarea>
+                    </div>
+                    <button type="submit" class="px-6 py-3 bg-brand-primary border border-brand-accent hover:bg-brand-accent rounded-lg font-bold transition w-full md:w-auto">Save Policies</button>
+                </form>
             </section>
 
         </main>
@@ -311,6 +329,43 @@
             loadPortfolio();
             loadPricing();
             loadOffers();
+            loadLegal();
+        }
+
+        // ==========================================
+        // LEGAL POLICIES CRUD
+        // ==========================================
+        document.getElementById('form-legal').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!isConnected) return showAlert("Error", "Not connected to database.");
+            
+            const btn = e.target.querySelector('button');
+            btn.innerText = "Saving..."; btn.disabled = true;
+
+            const data = {
+                terms: document.getElementById('l-terms').value,
+                privacy: document.getElementById('l-privacy').value
+            };
+
+            try {
+                await update(ref(db, "settings/legal"), data);
+                showAlert("Success", "Policies saved successfully.");
+            } catch (err) {
+                showAlert("Database Error", "Failed to save policies.");
+            } finally {
+                btn.innerText = "Save Policies"; btn.disabled = false;
+            }
+        });
+
+        async function loadLegal() {
+            try {
+                const snap = await get(ref(db, "settings/legal"));
+                if(snap.exists()) {
+                    const data = snap.val();
+                    document.getElementById('l-terms').value = data.terms || "";
+                    document.getElementById('l-privacy').value = data.privacy || "";
+                }
+            } catch(e) { console.error("Error loading legal text", e); }
         }
 
         // ==========================================
