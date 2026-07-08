@@ -91,6 +91,7 @@
                 <button onclick="switchTab('tab-services')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-[rgba(255,122,0,0.1)] hover:text-brand-accent transition font-bold"><i class="fas fa-robot w-6"></i> Manage Services</button>
                 <button onclick="switchTab('tab-portfolio')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-[rgba(255,122,0,0.1)] hover:text-brand-accent transition font-bold"><i class="fas fa-briefcase w-6"></i> Manage Portfolio</button>
                 <button onclick="switchTab('tab-pricing')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-[rgba(255,122,0,0.1)] hover:text-brand-accent transition font-bold"><i class="fas fa-tags w-6"></i> Manage Pricing</button>
+                <button onclick="switchTab('tab-offers')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-[rgba(255,122,0,0.1)] hover:text-brand-accent transition font-bold"><i class="fas fa-gift w-6"></i> Manage Offers</button>
             </nav>
             <div class="p-4 border-t border-[rgba(255,255,255,0.1)]">
                 <a href="index.html" class="block w-full text-center px-4 py-2 border border-gray-600 rounded-lg hover:bg-gray-800 transition text-sm">Return to Website</a>
@@ -180,6 +181,26 @@
                 </div>
             </section>
 
+            <!-- OFFERS TAB -->
+            <section id="tab-offers" class="tab-content max-w-4xl mx-auto">
+                <h1 class="text-3xl font-bold mb-8">Manage <span class="text-brand-accent">Offers</span></h1>
+                
+                <form id="form-offers" class="glass-panel p-6 rounded-2xl mb-8 space-y-4">
+                    <input type="hidden" id="o-id">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="o-title" required placeholder="Offer Title (e.g. Diwali Mega Sale)" class="w-full p-3 rounded-lg glass-input">
+                        <input type="text" id="o-link" placeholder="Optional Redirect Link (URL)" class="w-full p-3 rounded-lg glass-input">
+                    </div>
+                    <input type="text" id="o-img" required placeholder="Offer Image URL (Compulsory)" class="w-full p-3 rounded-lg glass-input border-brand-accent">
+                    <button type="submit" class="px-6 py-3 bg-brand-primary border border-brand-accent hover:bg-brand-accent rounded-lg font-bold transition w-full md:w-auto">Save Offer</button>
+                </form>
+
+                <h3 class="text-xl font-bold border-b border-gray-700 pb-2 mb-4">Active Offers</h3>
+                <div id="list-offers" class="grid grid-cols-1 gap-4">
+                    <p class="text-gray-500">Loading data...</p>
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -205,12 +226,13 @@
         const db = getDatabase(app);
         
         let isConnected = false;
-        window.adminData = { services: {}, portfolio: {}, pricing: {} }; // Holds data for editing
+        window.adminData = { services: {}, portfolio: {}, pricing: {}, offers: {} }; // Holds data for editing
 
         // Using simple root collections for Realtime Database
         const COL_SERVICES = "services";
         const COL_PORTFOLIO = "portfolio";
         const COL_PRICING = "pricing";
+        const COL_OFFERS = "offers";
 
         // Global Modal Alert
         window.showAlert = (title, message) => {
@@ -258,6 +280,12 @@
                 document.getElementById('pr-btn').value = data.buttonText || '';
                 document.getElementById('pr-popular').checked = data.isPopular || false;
                 document.getElementById('pr-features').value = data.features || '';
+            } else if (collectionName === COL_OFFERS) {
+                switchTab('tab-offers');
+                document.getElementById('o-id').value = id;
+                document.getElementById('o-title').value = data.title;
+                document.getElementById('o-link').value = data.link || '';
+                document.getElementById('o-img').value = data.img || '';
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
@@ -282,6 +310,7 @@
             loadServices();
             loadPortfolio();
             loadPricing();
+            loadOffers();
         }
 
         // ==========================================
@@ -349,138 +378,62 @@
         }
 
         // ==========================================
-        // PORTFOLIO CRUD
+        // OFFERS CRUD
         // ==========================================
-        document.getElementById('form-portfolio').addEventListener('submit', async (e) => {
+        document.getElementById('form-offers').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!isConnected) return showAlert("Error", "Not connected to database.");
             
             const btn = e.target.querySelector('button');
             btn.innerText = "Saving..."; btn.disabled = true;
 
-            const id = document.getElementById('p-id').value;
+            const id = document.getElementById('o-id').value;
             const data = {
-                title: document.getElementById('p-title').value,
-                category: document.getElementById('p-category').value,
-                client: document.getElementById('p-client').value,
-                imageMain: document.getElementById('p-image-main').value,
-                video: document.getElementById('p-video').value,
-                img1: document.getElementById('p-img1').value,
-                img2: document.getElementById('p-img2').value,
-                img3: document.getElementById('p-img3').value,
-                img4: document.getElementById('p-img4').value,
-                img5: document.getElementById('p-img5').value,
-                description: document.getElementById('p-desc').value
+                title: document.getElementById('o-title').value,
+                link: document.getElementById('o-link').value,
+                img: document.getElementById('o-img').value
             };
 
             try {
                 if(id) {
-                    await update(ref(db, COL_PORTFOLIO + '/' + id), data);
+                    await update(ref(db, COL_OFFERS + '/' + id), data);
                 } else {
-                    await push(ref(db, COL_PORTFOLIO), data);
+                    await push(ref(db, COL_OFFERS), data);
                 }
                 
                 e.target.reset();
-                document.getElementById('p-id').value = "";
-                loadPortfolio();
-                showAlert("Success", "Project saved successfully.");
+                document.getElementById('o-id').value = "";
+                loadOffers();
+                showAlert("Success", "Offer saved successfully.");
             } catch (err) {
                 console.error(err);
-                showAlert("Database Error", "Failed to save. Check database rules.");
+                showAlert("Database Error", "Failed to save.");
             } finally {
-                btn.innerText = "Save Project"; btn.disabled = false;
+                btn.innerText = "Save Offer"; btn.disabled = false;
             }
         });
 
-        async function loadPortfolio() {
-            const list = document.getElementById('list-portfolio');
+        async function loadOffers() {
+            const list = document.getElementById('list-offers');
             try {
-                const snap = await get(ref(db, COL_PORTFOLIO));
+                const snap = await get(ref(db, COL_OFFERS));
                 list.innerHTML = "";
-                window.adminData.portfolio = {};
-                if(!snap.exists()) { list.innerHTML = "<p class='text-gray-500'>No projects found.</p>"; return; }
+                window.adminData.offers = {};
+                if(!snap.exists()) { list.innerHTML = "<p class='text-gray-500'>No active offers.</p>"; return; }
                 
                 snap.forEach(childSnap => {
                     const d = childSnap.val();
                     const id = childSnap.key;
-                    window.adminData.portfolio[id] = d;
+                    window.adminData.offers[id] = d;
                     list.innerHTML += `
                         <div class="glass-panel p-4 rounded-lg flex justify-between items-center">
-                            <div class="flex items-center gap-3 truncate">
-                                <img src="${d.imageMain || 'https://placehold.co/100x100'}" class="w-12 h-12 object-cover rounded">
-                                <div>
-                                    <p class="font-bold truncate">${d.title}</p>
-                                    <p class="text-xs text-brand-accent">${d.category}</p>
-                                </div>
+                            <div class="flex items-center gap-4">
+                                <img src="${d.img}" class="w-16 h-12 object-cover rounded border border-gray-600">
+                                <span class="font-bold">${d.title}</span>
                             </div>
                             <div>
-                                <button onclick="editItem('${COL_PORTFOLIO}', '${id}')" class="text-blue-400 hover:text-blue-300 mr-4"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteItem('${COL_PORTFOLIO}', '${id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (err) { list.innerHTML = `<p class="text-red-500">Error loading data.</p>`; }
-        }
-
-        // ==========================================
-        // PRICING CRUD
-        // ==========================================
-        document.getElementById('form-pricing').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!isConnected) return showAlert("Error", "Not connected to database.");
-            
-            const btn = e.target.querySelector('button');
-            btn.innerText = "Saving..."; btn.disabled = true;
-
-            const id = document.getElementById('pr-id').value;
-            const data = {
-                title: document.getElementById('pr-title').value,
-                price: document.getElementById('pr-price').value,
-                buttonText: document.getElementById('pr-btn').value,
-                isPopular: document.getElementById('pr-popular').checked,
-                features: document.getElementById('pr-features').value
-            };
-
-            try {
-                if(id) {
-                    await update(ref(db, COL_PRICING + '/' + id), data);
-                } else {
-                    await push(ref(db, COL_PRICING), data);
-                }
-                
-                e.target.reset();
-                document.getElementById('pr-id').value = "";
-                loadPricing();
-                showAlert("Success", "Pricing package saved successfully.");
-            } catch (err) {
-                console.error(err);
-                showAlert("Database Error", "Failed to save. Check database rules.");
-            } finally {
-                btn.innerText = "Save Pricing Package"; btn.disabled = false;
-            }
-        });
-
-        async function loadPricing() {
-            const list = document.getElementById('list-pricing');
-            try {
-                const snap = await get(ref(db, COL_PRICING));
-                list.innerHTML = "";
-                window.adminData.pricing = {};
-                if(!snap.exists()) { list.innerHTML = "<p class='text-gray-500'>No pricing packages found.</p>"; return; }
-                
-                snap.forEach(childSnap => {
-                    const d = childSnap.val();
-                    const id = childSnap.key;
-                    window.adminData.pricing[id] = d;
-                    const popBadge = d.isPopular ? `<span class="bg-brand-accent text-white text-xs px-2 py-1 rounded ml-2">Popular</span>` : '';
-                    list.innerHTML += `
-                        <div class="glass-panel p-4 rounded-lg relative">
-                            <h4 class="font-bold text-lg mb-1">${d.title} ${popBadge}</h4>
-                            <p class="text-2xl text-brand-secondary mb-4">${d.price}</p>
-                            <div class="absolute top-4 right-4 flex space-x-3">
-                                <button onclick="editItem('${COL_PRICING}', '${id}')" class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteItem('${COL_PRICING}', '${id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                                <button onclick="editItem('${COL_OFFERS}', '${id}')" class="text-blue-400 hover:text-blue-300 mr-4"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('${COL_OFFERS}', '${id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
                     `;
@@ -498,6 +451,7 @@
                 if(collectionName === COL_SERVICES) loadServices();
                 if(collectionName === COL_PORTFOLIO) loadPortfolio();
                 if(collectionName === COL_PRICING) loadPricing();
+                if(collectionName === COL_OFFERS) loadOffers();
             } catch (error) {
                 showAlert("Error", "Could not delete item. Check your database rules.");
             }
