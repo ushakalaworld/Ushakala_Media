@@ -46,9 +46,25 @@
         .gradient-text { background: linear-gradient(90deg, #FF7A00, #FF2E7E); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .fade-in-up { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; }
         .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+        
+        /* Ensures line breaks in textarea show up properly in HTML */
+        .whitespace-pre-wrap { white-space: pre-wrap; } 
     </style>
 </head>
 <body class="relative antialiased">
+
+    <!-- Legal/Policies Modal Popup -->
+    <div id="legal-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm p-4">
+        <div class="glass-card w-full max-w-4xl max-h-[85vh] flex flex-col rounded-2xl relative overflow-hidden">
+            <div class="p-6 border-b border-[rgba(255,255,255,0.1)] flex justify-between items-center bg-[#081B38]">
+                <h3 id="legal-title" class="text-2xl font-bold text-brand-accent font-heading">Policies</h3>
+                <button onclick="closeLegal()" class="text-gray-400 hover:text-white text-3xl font-bold transition">&times;</button>
+            </div>
+            <div id="legal-content" class="p-8 overflow-y-auto text-gray-300 leading-relaxed whitespace-pre-wrap">
+                <!-- Content injected here -->
+            </div>
+        </div>
+    </div>
 
     <!-- Navigation -->
     <nav class="fixed top-0 w-full z-50 glass-panel border-b-0 py-4 transition-all duration-300" id="navbar">
@@ -228,6 +244,11 @@
                 <a href="mailto:ushakala.world@gmail.com" class="text-gray-400 hover:text-brand-accent transition"><i class="fas fa-envelope"></i></a>
             </div>
         </div>
+        <p class="text-gray-500 text-sm mb-2">
+            <a href="javascript:void(0)" onclick="openLegal('terms')" class="hover:text-brand-accent transition">Terms & Conditions</a> 
+            <span class="mx-2">|</span> 
+            <a href="javascript:void(0)" onclick="openLegal('privacy')" class="hover:text-brand-accent transition">Privacy Policy</a>
+        </p>
         <p class="text-gray-600 text-sm">
             &copy; <span id="year-tag"></span> UshaKala Media. All Rights Reserved. 
             <span class="mx-2">|</span> 
@@ -280,6 +301,7 @@
             fetchPortfolio();
             fetchPricing();
             fetchOffers();
+            fetchLegal();
             
             // Contact Form Submit Handler
             const contactForm = document.getElementById('contact-form');
@@ -455,6 +477,47 @@
                 }
             } catch(e) { console.error("Error fetching offers", e); }
         }
+
+        // Global Object to store Legal Text
+        window.legalData = {
+            terms: "Terms and conditions are currently being updated. Please check back soon.",
+            privacy: "Privacy policy is currently being updated. Please check back soon."
+        };
+
+        async function fetchLegal() {
+            try {
+                const snap = await get(ref(db, "settings/legal"));
+                if(snap.exists()) {
+                    const data = snap.val();
+                    if(data.terms) window.legalData.terms = data.terms;
+                    if(data.privacy) window.legalData.privacy = data.privacy;
+                }
+            } catch(e) { console.error("Error fetching legal docs", e); }
+        }
+
+        window.openLegal = function(type) {
+            const titleEl = document.getElementById('legal-title');
+            const contentEl = document.getElementById('legal-content');
+            const modal = document.getElementById('legal-modal');
+
+            if (type === 'terms') {
+                titleEl.innerText = "Terms & Conditions";
+                contentEl.innerText = window.legalData.terms;
+            } else {
+                titleEl.innerText = "Privacy Policy";
+                contentEl.innerText = window.legalData.privacy;
+            }
+            
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden'; 
+            modal.classList.remove('hidden');
+        };
+
+        window.closeLegal = function() {
+            document.body.style.overflow = 'auto'; // Restore scroll
+            document.getElementById('legal-modal').classList.add('hidden');
+        };
+
     </script>
 </body>
 </html>
