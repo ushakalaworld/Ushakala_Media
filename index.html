@@ -275,26 +275,39 @@
                     e.preventDefault();
                     const btn = contactForm.querySelector('button');
                     const status = document.getElementById('contact-status');
-                    btn.innerText = 'Sending...';
+                    btn.innerText = 'Redirecting...';
                     btn.disabled = true;
                     
+                    const name = document.getElementById('c-name').value;
+                    const email = document.getElementById('c-email').value;
+                    const message = document.getElementById('c-message').value;
+                    
                     try {
+                        // 1. Save backup to Firebase Database
                         await push(ref(db, "inquiries"), {
-                            name: document.getElementById('c-name').value,
-                            email: document.getElementById('c-email').value,
-                            message: document.getElementById('c-message').value,
+                            name: name,
+                            email: email,
+                            message: message,
                             timestamp: Date.now()
                         });
-                        status.innerText = "Message sent successfully!";
+                        
+                        // 2. Open WhatsApp directly with pre-filled message
+                        const phone = "918830903621";
+                        const waText = `Hello UshaKala Media!%0A%0A*Name:* ${name}%0A*Email:* ${email}%0A*Message:* ${message}`;
+                        window.open(`https://wa.me/${phone}?text=${waText}`, '_blank');
+
+                        status.innerText = "Redirecting to WhatsApp...";
                         status.className = "mt-4 text-center text-green-400 font-bold block";
                         contactForm.reset();
                     } catch (error) {
                         status.innerText = "Error sending message. Try calling us!";
                         status.className = "mt-4 text-center text-red-400 font-bold block";
                     } finally {
-                        btn.innerText = 'Send Message';
-                        btn.disabled = false;
-                        setTimeout(() => status.classList.add('hidden'), 5000);
+                        setTimeout(() => {
+                            btn.innerText = 'Send Message';
+                            btn.disabled = false;
+                            status.classList.add('hidden');
+                        }, 3000);
                     }
                 });
             }
@@ -332,11 +345,36 @@
                 if(snap.exists()) {
                     snap.forEach(child => {
                         const data = child.val();
+                        
+                        // Handle optional gallery images
+                        let galleryHtml = '';
+                        const extras = [data.img1, data.img2, data.img3, data.img4, data.img5].filter(img => img && img.trim() !== '');
+                        if (extras.length > 0) {
+                            galleryHtml = `<div class="flex gap-2 overflow-x-auto pb-2 mb-3 snap-x">`;
+                            extras.forEach(img => {
+                                galleryHtml += `<img src="${img}" class="h-12 w-12 object-cover rounded border border-gray-700 snap-start">`;
+                            });
+                            galleryHtml += `</div>`;
+                        }
+
+                        // Handle optional video
+                        const videoHtml = data.video && data.video.trim() !== '' ? 
+                            `<a href="${data.video}" target="_blank" class="mt-4 block text-center w-full py-2 bg-[rgba(255,46,126,0.1)] text-brand-secondary hover:bg-brand-secondary hover:text-white transition rounded-lg text-sm font-bold"><i class="fas fa-play-circle mr-2"></i> Watch Project Video</a>` : '';
+
+                        // Handle optional client
+                        const clientHtml = data.client ? `<p class="text-xs text-brand-accent mb-2"><i class="fas fa-building mr-1"></i> ${data.client}</p>` : '';
+
                         container.innerHTML += `
                             <div class="glass-card p-6 rounded-2xl group hover:border-brand-secondary transition">
                                 <img src="${data.imageMain}" alt="${data.title}" class="w-full h-48 object-cover rounded-xl mb-4 border border-[rgba(255,255,255,0.1)]">
-                                <h3 class="text-2xl font-bold mb-1">${data.title}</h3>
+                                ${galleryHtml}
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="text-2xl font-bold">${data.title}</h3>
+                                    <span class="px-2 py-1 bg-[rgba(255,46,126,0.2)] text-brand-secondary text-xs rounded uppercase">${data.category || 'Project'}</span>
+                                </div>
+                                ${clientHtml}
                                 <p class="text-gray-400 text-sm">${data.description}</p>
+                                ${videoHtml}
                             </div>
                         `;
                     });
