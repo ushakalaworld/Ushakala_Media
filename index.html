@@ -714,6 +714,69 @@
             }
         });
 
-    </script>
+    </script><!-- ... existing code ... -->
+                        // Handle optional gallery images for the mini-preview
+                        let galleryHtml = '';
+                        const extras = [data.img1, data.img2, data.img3, data.img4, data.img5].filter(img => img && img.trim() !== '');
+                        if (extras.length > 0) {
+                            galleryHtml = `<div class="flex gap-2 overflow-x-auto pb-2 mb-3 snap-x">`;
+                            extras.forEach(img => {
+                                galleryHtml += `<img src="${img}" onerror="this.style.display='none';" class="h-12 w-12 object-cover rounded border border-gray-700 snap-start">`;
+                            });
+                            galleryHtml += `</div>`;
+                        }
+
+                        // Handle optional client
+<!-- ... existing code ... -->
+                        const websiteHtml = liveUrl ? `<a href="${liveUrl}" target="_blank" class="inline-block mt-4 px-4 py-2 border border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white transition rounded-lg text-sm font-bold shadow-[0_0_10px_rgba(59,130,246,0.2)]"><i class="fas fa-globe mr-2"></i>Visit Live Website</a>` : '';
+
+                        // NEW: Added interactive clickable image wrapper
+                        container.innerHTML += `
+                            <div class="glass-card p-6 rounded-2xl group hover:border-brand-secondary transition">
+                                <div class="relative group/img cursor-pointer overflow-hidden rounded-xl mb-4" onclick="openLightbox('${id}')">
+                                    <img src="${data.imageMain}" alt="${data.title}" onerror="this.onerror=null; this.src='https://placehold.co/600x400/081B38/FF7A00?text=No+Image+Found';" class="w-full h-48 object-cover group-hover/img:scale-105 transition duration-500">
+                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover/img:bg-opacity-60 flex items-center justify-center transition duration-300">
+                                        <i class="fas fa-expand text-white text-4xl opacity-0 group-hover/img:opacity-100 transition duration-300 scale-50 group-hover/img:scale-100"></i>
+                                    </div>
+                                    <div class="absolute top-2 right-2 bg-brand-accent text-white text-xs font-bold px-2 py-1 rounded shadow-lg">
+                                        <i class="fas fa-images mr-1"></i> View Gallery
+                                    </div>
+                                </div>
+                                ${galleryHtml}
+<!-- ... existing code ... -->
+            setTimeout(() => {
+                if (media.type === 'image') {
+                    container.innerHTML = `<img src="${media.src}" onerror="this.onerror=null; this.src='https://placehold.co/800x600/000000/FF7A00?text=Image+Not+Found';" class="max-w-full max-h-full object-contain rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-fade-in" alt="Gallery Image">`;
+                } else if (media.type === 'video') {
+                    if(media.src) {
+<!-- ... existing code ... -->
+```
+
+### 2. Update the Admin Dashboard (`admin.html`)
+This adds the same safety net to your admin list so you can clearly see when an image link is broken.
+
+```html:UshaKala Media - Admin Dashboard:admin.html
+<!-- ... existing code ... -->
+                snap.forEach(childSnap => {
+                    const d = childSnap.val();
+                    const id = childSnap.key;
+                    window.adminData.portfolio[id] = d;
+                    list.innerHTML += `
+                        <div class="glass-panel p-4 rounded-lg flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <img src="${d.imageMain || 'https://placehold.co/100x100'}" onerror="this.onerror=null; this.src='https://placehold.co/100x100/081B38/FF7A00?text=Error';" class="w-12 h-12 object-cover rounded border border-gray-600">
+                                <span class="font-bold">${d.title}</span>
+                            </div>
+                            <div>
+                                <button onclick="editItem('${COL_PORTFOLIO}', '${id}')" class="text-blue-400 hover:text-blue-300 mr-4"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('${COL_PORTFOLIO}', '${id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+<!-- ... existing code ... -->
+```
+
+### How to Fix Your Data:
+Once you apply these updates, log into your Admin Panel and click the **Edit** icon (the blue pencil) next to your "Clothing Brand Website" project.
+1. Clear whatever is inside the **Main Cover Image URL** box, and paste a real image link into it (you can upload an image to a free host like Imgur, or use an image address from Google).
+2. Paste the URL of the actual website you built into the box labeled **Live Website URL (Optional)**.
+3. Click Save! When you refresh your main site, it will look perfect and have the "Visit Live Website" button.
 </body>
 </html>
