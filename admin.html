@@ -133,6 +133,7 @@
                         <input type="text" id="p-category" required placeholder="Category (e.g. B2B, B2C)" class="w-full p-3 rounded-lg glass-input">
                         <input type="text" id="p-client" placeholder="Client Name (Optional)" class="w-full p-3 rounded-lg glass-input">
                         <input type="text" id="p-video" placeholder="Video URL (Optional)" class="w-full p-3 rounded-lg glass-input">
+                        <input type="text" id="p-website" placeholder="Live Website URL e.g. https://example.com (Optional)" class="w-full p-3 rounded-lg glass-input md:col-span-2 border-blue-500">
                     </div>
                     
                     <h4 class="font-bold text-gray-300 mt-4 mb-2">Media URLs</h4>
@@ -282,8 +283,9 @@
                 document.getElementById('p-title').value = data.title;
                 document.getElementById('p-category').value = data.category || '';
                 document.getElementById('p-client').value = data.client || '';
-                document.getElementById('p-image-main').value = data.imageMain || '';
                 document.getElementById('p-video').value = data.video || '';
+                document.getElementById('p-website').value = data.website || '';
+                document.getElementById('p-image-main').value = data.imageMain || '';
                 document.getElementById('p-img1').value = data.img1 || '';
                 document.getElementById('p-img2').value = data.img2 || '';
                 document.getElementById('p-img3').value = data.img3 || '';
@@ -448,6 +450,7 @@
                 category: document.getElementById('p-category').value,
                 client: document.getElementById('p-client').value,
                 video: document.getElementById('p-video').value,
+                website: document.getElementById('p-website').value,
                 imageMain: document.getElementById('p-image-main').value,
                 img1: document.getElementById('p-img1').value,
                 img2: document.getElementById('p-img2').value,
